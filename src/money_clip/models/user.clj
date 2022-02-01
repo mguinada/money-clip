@@ -31,16 +31,16 @@
     ::active true}))
 
 (s/fdef new-user
-  :args (s/alt
-         :without-id (s/cat
-                      :email ::email
-                      :password ::password
-                      :first-name ::first-name
-                      :last-name ::last-name)
-         :with-id (s/cat
-                   :id ::id
-                   :email ::email
-                   :password ::password
-                   :first-name ::first-name
-                   :last-name ::last-name))
-  :ret ::user)
+        :args (s/alt
+               :without-id (s/cat
+                            :email ::email
+                            :password ::password
+                            :first-name ::first-name
+                            :last-name ::last-name)
+               :with-id (s/cat
+                         :id ::id
+                         :email ::email
+                         :password ::password
+                         :first-name ::first-name
+                         :last-name ::last-name))
+        :ret ::user)

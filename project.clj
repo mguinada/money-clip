@@ -17,11 +17,15 @@
   :prep-tasks     ["javac" "compile" ["run" ":duct/compiler"]]
   :middleware     [lein-duct.plugin/middleware]
   :profiles
-  {:dev  [:project/dev :profiles/dev]
+  {:dev  [:project/dev :profiles/dev :profiles/instrument]
    :repl {:prep-tasks   ^:replace ["javac" "compile"]
           :repl-options {:init-ns user}}
    :uberjar {:aot :all}
    :profiles/dev {}
+   :profiles/instrument {:injections [(require 'money-clip.utils)
+                                      (require 'money-clip.models.user)
+                                      (require 'clojure.spec.test.alpha)
+                                      (clojure.spec.test.alpha/instrument)]}
    :project/dev  {:source-paths   ["dev/src"]
                   :resource-paths ["dev/resources"]
                   :dependencies   [[integrant/repl "0.3.2"]
