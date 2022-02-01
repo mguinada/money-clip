@@ -3,7 +3,7 @@
             [buddy.hashers :as hs]
             [money-clip.utils :as u]))
 
-(s/def ::id (s/or :int int? :nil nil?))
+(s/def ::id (s/or :int nat-int? :nil nil?))
 (s/def ::email u/email?)
 (s/def ::password (s/and string? #(>= (count %) 8)))
 (s/def ::first-name (s/and string? u/required))

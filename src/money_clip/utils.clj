@@ -26,6 +26,6 @@
   "Returns true if `s` is a valid email address, false otherwise."
   [s]
   (->> s
-       (str)
+       str
        (re-matches email-regexp)
-       (boolean)))
+       boolean))
