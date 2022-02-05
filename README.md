@@ -6,6 +6,19 @@ FIXME: description
 
 ### Setup
 
+Create the development and test databases at postgres RDBMS:
+
+```sql
+CREATE DATABASE money_clip_development;
+CREATE DATABASE money_clip_test;
+```
+
+Add an evironment var with a session secret key:
+
+```bash
+export JWT_SECRET=<secret>
+```
+
 When you first clone this repository, run:
 
 ```sh

@@ -1,6 +1,9 @@
 (ns money-clip.utils-test
   (:require [clojure.test :refer [deftest testing is]]
+            [clojure.spec.test.alpha :as st]
             [money-clip.utils :as ut]))
+
+(st/instrument)
 
 (deftest blank?-test
   (testing "blank values"
@@ -57,3 +60,26 @@
 (deftest map-keys-test
   (testing "maps a function to the keys of a map"
     (is (= {"a" 1 "b" 2 "c" 3} (ut/map-keys #(name %) {:a 1 :b 2 :c 3})))))
+
+(deftest qkey
+  (testing "builds a qualified keyword"
+    (is (= ::keyword (ut/qkey :keyword 'money-clip.utils-test)))
+    (is (= ::keyword (ut/qkey :already.namespaced/keyword 'money-clip.utils-test)))
+    (is (= ::keyword (ut/qkey "keyword" 'money-clip.utils-test)))
+    (is (= ::keyword (ut/qkey "keyword" "money-clip.utils-test")))))
+
+(deftest unqkey
+  (testing "turns a qualified keyword into unqualified"
+    (is (= :keyword (ut/unqkey ::keyword)))))
+
+(deftest qualify-keys
+  (testing "qualifies the key of a map"
+    (is (= {::a 1 ::b 2 ::c 3 ::d 4} (ut/qualify-keys {:a 1 :b 2 :c 3 :d 4} 'money-clip.utils-test))))
+  (testing "when given `nil` as a map"
+    (is (nil? (ut/qualify-keys nil 'money-clip.utils-test)))))
+
+(deftest unqualify-keys
+  (testing "unqualifies the key of a map"
+    (is (= {:a 1 :b 2 :c 3 :d 4} (ut/unqualify-keys {::a 1 ::b 2 ::c 3 ::d 4}))))
+  (testing "when given `nil` as a map"
+    (is (nil? (ut/unqualify-keys nil)))))

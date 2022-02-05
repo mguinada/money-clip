@@ -9,7 +9,8 @@
             [eftest.runner :as eftest]
             [integrant.core :as ig]
             [integrant.repl :refer [clear halt go init prep reset]]
-            [integrant.repl.state :refer [config system]]))
+            [integrant.repl.state :refer [config system]]
+            [clojure.java.jdbc :as jdbc]))
 
 (duct/load-hierarchy)
 
@@ -17,7 +18,7 @@
   (duct/read-config (io/resource "money_clip/config.edn")))
 
 (defn test []
-  (eftest/run-tests (eftest/find-tests "test")))
+  (eftest/run-tests (eftest/find-tests "test") {:multithread? :namespaces}))
 
 (def profiles
   [:duct.profile/dev :duct.profile/local])
@@ -28,3 +29,10 @@
   (load "local"))
 
 (integrant.repl/set-prep! #(duct/prep-config (read-config) profiles))
+
+(defn db []
+  (prep)
+  (:duct.database.sql/hikaricp config))
+
+(defn q [sql]
+  (jdbc/query (db) sql))

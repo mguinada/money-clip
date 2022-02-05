@@ -3,17 +3,20 @@
 
   :duct.router/ataraxy
   {:routes
-   {[:get "/example"] 
-    [:money-clip.handler/example]
+   {[:post "/users" {{:keys [email password first-name last-name]} :body-params}]
+    [:money-clip.handler.users/create email password first-name last-name]
 
-    [:post "/users" {{:keys [email password first-name last-name]} :body-params}]
-    [:money-clip.handler.users/create email password first-name last-name]}}
-
-  :money-clip.handler/example
-  {:db #ig/ref :duct.database/sql}
+    [:post "/login" {{:keys [email password]} :body-params}]
+    [:money-clip.handler.users/login email password]}}
 
   :money-clip.handler.users/create
   {:db #ig/ref :duct.database/sql}
+
+  :money-clip.handler.users/login
+  {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
+
+  :duct.middleware.buddy/authentication
+  {:backend :jws :secret #duct/env "JWT_SECRET"}
 
   :duct.migrator/ragtime
   {:migrations #ig/ref :duct.migrator.ragtime/resources}
@@ -22,6 +25,7 @@
   {:path "money_clip/migrations"}}
 
  :duct.profile/dev   #duct/include "dev"
+ :duct.profile/test  #duct/include "test"
  :duct.profile/local #duct/include "local"
  :duct.profile/prod  {}
 

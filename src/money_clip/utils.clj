@@ -59,10 +59,36 @@
   [sk]
   (replace sk #"_" "-"))
 
+(defn qkey
+  "Returns a qualified keyword namespaced to `ns`.
+   If the given keyword is already namespaced, it will be \"requalified\" to the given namespace."
+  [k ns]
+  (keyword (name ns) (name k)))
+
+(defn unqkey
+  "turns a qualified keyword into unqualified"
+  [k]
+  (-> k name keyword))
+
 (defn map-keys
   "Maps a function to the keys of a map"
   [f m]
   (reduce-kv (fn [nm k v] (assoc nm (apply f [k]) v)) {} m))
+
+(defn qualify-keys
+  "Turns a map's key into qualified keys.
+   If some keys are already namespaced, it will be \"requalified\" to the given namespace."
+  [m ns]
+  (if-not (nil? m)
+    (map-keys #(qkey % ns) m)
+    nil))
+
+(defn unqualify-keys
+  "Turns a map's key into unqualified keys."
+  [m]
+  (if-not (nil? m)
+    (map-keys unqkey m)
+    nil))
 
 (s/fdef blank?
   :args (s/cat :val any?)
@@ -77,9 +103,10 @@
   :ret boolean?)
 
 (s/fdef replace
-  :args (s/cat :sk (s/or :keyword keyword? :string string?)
-               :match regexp?
-               :replacement string?)
+  :args (s/cat
+         :sk (s/or :keyword keyword? :string string?)
+         :match regexp?
+         :replacement string?)
   :ret (s/or :keyword keyword? :string string?))
 
 (s/fdef underscore
@@ -90,6 +117,22 @@
   :args (s/cat :sk (s/or :keyword keyword? :string string?))
   :ret (s/or :keyword keyword? :string string?))
 
+(s/fdef qkey
+  :args (s/cat :keyword (s/or :keyword keyword? :string string?) :ns (s/or :symbol symbol? :string string?))
+  :ret qualified-keyword?)
+
+(s/fdef unqkey
+  :args (s/cat :keyword keyword?)
+  :ret keyword?)
+
 (s/fdef map-keys
   :args (s/cat :f fn? :m map?)
   :ret map?)
+
+(s/fdef qualify-keys
+  :args (s/cat :map (s/or :map map? :nil nil?) :ns (s/or :symbol symbol? :string string?))
+  :ret (s/or :map map? :nil nil?))
+
+(s/fdef unqualify-keys
+  :args (s/cat :map (s/or :map map? :nil nil?))
+  :ret (s/or :map map? :nil nil?))
