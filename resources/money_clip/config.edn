@@ -7,7 +7,9 @@
     [:money-clip.handler.users/create email password first-name last-name]
 
     [:post "/login" {{:keys [email password]} :body-params}]
-    [:money-clip.handler.users/login email password]}}
+    ^:unkey [:money-clip.handler.users/login email password]}
+   :middleware
+   {:unkey #ig/ref :money-clip.middleware.unqualifier/unqualify}}
 
   :money-clip.handler.users/create
   {:db #ig/ref :duct.database/sql}
@@ -17,6 +19,8 @@
 
   :duct.middleware.buddy/authentication
   {:backend :jws :secret #duct/env "JWT_SECRET"}
+
+  :money-clip.middleware.unqualifier/unqualify {}
 
   :duct.migrator/ragtime
   {:migrations #ig/ref :duct.migrator.ragtime/resources}
