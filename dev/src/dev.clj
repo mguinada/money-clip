@@ -18,7 +18,7 @@
   (duct/read-config (io/resource "money_clip/config.edn")))
 
 (defn test []
-  (eftest/run-tests (eftest/find-tests "test") {:multithread? :namespaces}))
+  (eftest/run-tests (eftest/find-tests "test") {:multithread? false}))
 
 (def profiles
   [:duct.profile/dev :duct.profile/local])

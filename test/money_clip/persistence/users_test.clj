@@ -1,8 +1,8 @@
 (ns money-clip.persistence.users-test
   (:require [clojure.test :refer [deftest testing is] :as t]
             [clojure.spec.test.alpha :as st]
-            [money-clip.persistence.users :as users]
             [money-clip.persistence.db :as db]
+            [money-clip.persistence.users :as users]
             [money-clip.model.user :as u]))
 
 (st/instrument)
@@ -16,6 +16,14 @@
       (is (= "john.doe@doe.net" (::u/email (users/create-user @db/db user)))))
     (testing "when the user's email is already in use"
       (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Email already taken" (users/create-user @db/db user))))))
+
+(deftest find-user-by-id-test
+  (testing "when the user with the given id exists"
+    (let [new-user (u/new-user "john.doe@doe.net" "pa6w00rd" "John" "Doe")
+          user (users/create-user @db/db new-user)]
+      (is (= user (users/find-user-by-id @db/db (::u/id user))))))
+  (testing "when the user with the given id doesn't exist"
+    (is (nil? (users/find-user-by-id @db/db 1)))))
 
 (deftest find-user-by-email-test
   (testing "when the user with the given email exists"

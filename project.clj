@@ -29,6 +29,7 @@
    :profiles/dev {}
    :profiles/instrument {:injections [(require 'money-clip.utils)
                                       (require 'money-clip.model.user)
+                                      (require 'money-clip.model.bank-account)
                                       (require 'money-clip.persistence)
                                       (require 'money-clip.persistence.users)
                                       (require 'money-clip.mock)

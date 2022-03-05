@@ -47,8 +47,7 @@
    *NOTICE*: Test runners that run test in parallel can break the truncation step.
 
    e.g. if you are using https://github.com/weavejester/eftest you must disable parallelism
-   with `(eftest/run-tests (eftest/find-tests \"test\") {:multithread? :namespaces})` or
-   even `(run-tests (find-tests \"test\") {:multithread? false})` depending on yout usage pattern.
+   with `(run-tests (find-tests \"test\") {:multithread? false})`.
    "
   [test-fn]
   (truncate @db)
