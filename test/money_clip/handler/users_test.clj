@@ -12,18 +12,18 @@
 (st/instrument)
 
 (deftest create-user-test
-  (let [data {:email "john.doe@doe.net" :password "pa66w0rd" :first-name "John" :last-name "Doe"}
-        user (-> data (assoc :id 1) (ut/qualify-keys 'money-clip.model.user))
+  (let [data {:email "john.doe@doe.net" :password "pa66w0rd" :first-name "John" :last-name "Doe" :password-confirmation "pa66w0rd"}
+        user (-> data (assoc :id 1) (dissoc :password-confirmation) (ut/qualify-keys 'money-clip.model.user))
         db (sh/mock users/Users {:create-user user})
         handler (ig/init-key :money-clip.handler.users/create {:db db})
         response (handler (-> (mock/request :post "/users" data)))]
-    (is (sh/received? db users/create-user (vector (apply u/new-user (vals data)))) "creates the user")
+    (is (sh/received? db users/create-user [(apply u/new-user (vals (dissoc data :password-confirmation))) (:password-confirmation data)]) "creates the user")
     (is (= :ataraxy.response/created (first response)) "HTTP response")
     (is (= "/users/1" (second response)) "returns the path")
     (is (= {:user (-> user (dissoc ::u/password) ut/unqualify-keys)} (nth response 2)) "returns the user")))
 
 (deftest login-test
-  (testing "when the provided credetials are valid"
+  (testing "when the provided credentials are valid"
     (let [data {:email "john.doe@doe.net" :password "pa66w0rd"}
           user (-> data (assoc :id 1) (ut/qualify-keys 'money-clip.model.user))
           db (sh/mock users/Users {:authenticate-user user})

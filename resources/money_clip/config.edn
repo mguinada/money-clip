@@ -3,8 +3,8 @@
 
   :duct.router/ataraxy
   {:routes
-   {[:post "/users" {{:keys [email password first-name last-name]} :body-params}]
-    [:money-clip.handler.users/create email password first-name last-name]
+   {[:post "/users" {{:keys [email password first-name last-name password-confirmation]} :body-params}]
+    [:money-clip.handler.users/create email password first-name last-name password-confirmation]
 
     [:post "/login" {{:keys [email password]} :body-params}]
     [:money-clip.handler.users/login email password]}}

@@ -10,20 +10,22 @@
   (p/serializer u/user :id :email :password :first_name :last_name :active :created_at :updated_at))
 
 (defprotocol Users
-  (create-user [db user])
+  (create-user [db user password-confirmation])
   (find-user-by-id [db user-id])
   (find-user-by-email [db email])
   (authenticate-user [db email password]))
 
 (extend-protocol Users
   duct.database.sql.Boundary
-  (create-user [{db :spec :as this} user]
+  (create-user [{db :spec :as this} user password-confirmation]
     (p/check-spec! ::u/user user)
-    (if-not (find-user-by-email this (::u/email user))
-      (let [user (update user ::u/password #(hs/derive % {:alg :pbkdf2+sha512}))
-            results (jdbc/insert! db :users (p/underscore-keys user))]
-        (-> results serialize))
-      (throw (ex-info "Email already taken" {:reason ::email-taken :email (::u/email user)}))))
+    (if (= (::u/password user) password-confirmation)
+      (if-not (find-user-by-email this (::u/email user))
+        (let [user (update user ::u/password #(hs/derive % {:alg :pbkdf2+sha512}))
+              results (jdbc/insert! db :users (p/underscore-keys user))]
+          (-> results serialize))
+        (throw (ex-info "Email already taken" {:reason ::email-taken :email (::u/email user)})))
+      (throw (ex-info "Passwords don't match" {:reason ::passwords-dont-match :email (::u/email user)}))))
   (find-user-by-id [{db :spec} user-id]
     (let [results (jdbc/query db ["SELECT id, email, password, first_name, last_name, active, created_at, updated_at FROM users WHERE id = ?", user-id])]
       (-> results serialize)))
@@ -38,7 +40,8 @@
 (s/fdef create-user
   :args (s/cat
          :db ::p/db
-         :user ::u/user)
+         :user ::u/user
+         :password-confirmation string?)
   :ret ::u/user)
 
 (s/fdef find-user-by-id

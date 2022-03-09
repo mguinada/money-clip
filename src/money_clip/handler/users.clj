@@ -8,8 +8,8 @@
             [money-clip.model.user :as u]))
 
 (defmethod ig/init-key ::create [_ {:keys [db]}]
-  (fn [{[_ email password first-name last-name] :ataraxy/result}]
-    (let [user (users/create-user db (u/new-user email password first-name last-name))]
+  (fn [{[_ email password first-name last-name password-confirmation] :ataraxy/result}]
+    (let [user (users/create-user db (u/new-user email password first-name last-name) password-confirmation)]
       [::response/created (str "/users/" (::u/id user)) {:user (-> user (dissoc ::u/password) ut/unqualify-keys)}])))
 
 (defmethod ig/init-key ::login [_ {:keys [db jwt-secret]}]
