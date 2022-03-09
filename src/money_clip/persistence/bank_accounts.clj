@@ -7,9 +7,6 @@
             [money-clip.persistence.users :as users]
             [money-clip.model.bank-account :as ba]))
 
-(def ^:private serialize
-  (p/serializer ba/bank-account :id :user_id :name :bank_name :created_at :updated_at))
-
 (defn serializer
   [row]
   (if-not (nil? row)
@@ -28,17 +25,12 @@
       (dissoc ::ba/user)
       (assoc ::ba/user-id (::u/id user))))
 
-(defn- ids-to-entities
-  [db {user-id ::ba/user :as bank-account}]
-  (-> bank-account
-      (assoc ::ba/user (-> (users/find-user-by-id db user-id) (dissoc ::u/password)))))
-
 (extend-protocol BankAccounts
   duct.database.sql.Boundary
   (create-bank-account [{db :spec :as db-spec} bank-account]
     (p/check-spec! ::ba/bank-account bank-account)
     (let [results (jdbc/insert! db :bank_accounts (-> bank-account entities-to-ids p/underscore-keys))]
-      (ids-to-entities db-spec (-> results serialize))))
+      (find-bank-account-by-id db-spec (-> results first :id))))
   (find-bank-account-by-id [{db :spec} id]
     (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.id = ?", id])]
       (-> results first serializer)))
