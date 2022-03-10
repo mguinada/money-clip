@@ -3,17 +3,26 @@
 
   :duct.router/ataraxy
   {:routes
-   {[:post "/users" {{:keys [email password first-name last-name password-confirmation]} :body-params}]
-    [:money-clip.handler.users/create email password first-name last-name password-confirmation]
+   {[:post "/users" {{:keys [email password password-confirmation first-name last-name]} :body-params}]
+    [:money-clip.handler.users/create email password password-confirmation first-name last-name]
 
     [:post "/login" {{:keys [email password]} :body-params}]
-    [:money-clip.handler.users/login email password]}}
+    [:money-clip.handler.users/login email password]
+
+    [:post "/bank-accounts" {{:keys [name bank-name]} :body-params}]
+    ^:jws-auth [:money-clip.handler.bank-accounts/create name bank-name]}
+
+   :middleware
+   {:jws-auth #ig/ref :duct.middleware.buddy/authentication}}
 
   :money-clip.handler.users/create
   {:db #ig/ref :duct.database/sql}
 
   :money-clip.handler.users/login
   {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
+
+  :money-clip.handler.bank-accounts/create
+  {:db #ig/ref :duct.database/sql}
 
   :duct.middleware.buddy/authentication
   {:backend :jws :secret #duct/env "JWT_SECRET"}
