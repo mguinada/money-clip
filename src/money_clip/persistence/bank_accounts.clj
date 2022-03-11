@@ -4,7 +4,6 @@
             [clojure.java.jdbc :as jdbc]
             [money-clip.persistence :as p]
             [money-clip.model.user :as u]
-            [money-clip.persistence.users :as users]
             [money-clip.model.bank-account :as ba]))
 
 (defn serializer

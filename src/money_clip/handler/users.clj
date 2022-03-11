@@ -16,7 +16,7 @@
   (letfn [(sign-token [user]
                       (->>
                        {:exp (t/>> (t/now) (t/new-period 1 :days))}
-                       (jwt/sign (select-keys user [::u/email]) jwt-secret)
+                       (jwt/sign (select-keys user [::u/id ::u/email]) jwt-secret)
                        (assoc user ::u/auth-token)))]
     (fn [{[_ email password] :ataraxy/result}]
       (if-let [user (users/authenticate-user db email password)]
