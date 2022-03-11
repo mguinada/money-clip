@@ -32,6 +32,7 @@
                                       (require 'money-clip.model.bank-account)
                                       (require 'money-clip.persistence)
                                       (require 'money-clip.persistence.users)
+                                      (require 'money-clip.persistence.bank-accounts)
                                       (require 'money-clip.mock)
                                       (require 'clojure.spec.test.alpha)
                                       (clojure.spec.test.alpha/instrument)]}

@@ -1,6 +1,6 @@
 CREATE TABLE bank_accounts (
   id serial PRIMARY KEY,
-  user_id integer NOT NULL,
+  user_id integer REFERENCES users (id) ON delete cascade NOT NULL,
   name varchar(255) NOT NULL,
   bank_name varchar(255),
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

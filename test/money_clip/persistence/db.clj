@@ -16,10 +16,12 @@
       (ig/init [:duct.profile/test :duct.database/sql :duct.migrator/ragtime])))
 
 (defn- truncate
-  [{db :spec}]
-  (let [tables (map :relname (jdbc/query db ["SELECT relname FROM pg_stat_user_tables WHERE relname <> 'ragtime_migrations'"]))]
+  [{db :spec} & tables]
+  (let [tables (if (empty? tables)
+                 (map :relname (jdbc/query db ["SELECT relname FROM pg_stat_user_tables WHERE relname <> 'ragtime_migrations'"]))
+                 (map name tables))]
     (doseq [table tables]
-      (jdbc/execute! db [(str "TRUNCATE TABLE " table)]))))
+      (jdbc/execute! db [(str "TRUNCATE TABLE " table " CASCADE")]))))
 
 (def db (atom nil))
 
