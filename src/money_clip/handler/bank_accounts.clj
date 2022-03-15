@@ -1,14 +1,16 @@
 (ns money-clip.handler.bank-accounts
   (:require [ataraxy.response :as response]
             [integrant.core :as ig]
-            [buddy.auth :as auth]))
+            [money-clip.errors :as e]
+            [money-clip.model.user :as u]
+            [money-clip.model.bank-account :as ba]
+            [money-clip.persistence.users :as users]
+            [money-clip.persistence.bank-accounts :as bank-accounts]))
 
 (defmethod ig/init-key ::create [_ {:keys [db]}]
-  (fn [{:keys [identity] :as request}]
-    ;; (println "args" args)
-    (println "REQUEST" request)
-    (println "ID" identity)
-    (println "AUTHENTICATED?" (auth/authenticated? request))
-    (println)
-    ;; (when-not (auth/authenticated? request) (auth/throw-unauthorized))
-    [::response/ok "Hello World"]))
+  (fn [{[_ name bank-name] :ataraxy/result {user-id ::u/id} :identity}]
+    (let [user (users/find-user-by-id db user-id)
+          bank-account (bank-accounts/create-bank-account db (ba/new-bank-account user name bank-name))]
+      [::response/created
+       (str "/bank-accounts/" (::ba/id bank-account))
+       {:bank-account bank-account}])))

@@ -3,6 +3,7 @@
             [duct.database.sql]
             [clojure.java.jdbc :as jdbc]
             [buddy.hashers :as hs]
+            [money-clip.errors :as e]
             [money-clip.persistence :as p]
             [money-clip.model.user :as u]))
 
@@ -20,8 +21,8 @@
   (create-user [{db :spec :as this} user password-confirmation]
     (p/check-spec! ::u/user user)
     (cond
-      (not= (::u/password user) password-confirmation) (throw (ex-info "Passwords don't match" {:reason ::passwords-dont-match :email (::u/email user)}))
-      (find-user-by-email this (::u/email user)) (throw (ex-info "Email already taken" {:reason ::email-taken :email (::u/email user)}))
+      (not= (::u/password user) password-confirmation) (throw (e/password-dont-match-error "Passwords don't match" ::passwords-dont-match {:attribute :password}))
+      (find-user-by-email this (::u/email user)) (throw (e/uniqueness-violation-error "Email already taken" ::email-taken {:attribute :email :value (::u/email user)}))
       :else (let [user (update user ::u/password #(hs/derive % {:alg :pbkdf2+sha512}))
                   results (jdbc/insert! db :users (p/underscore-keys user))]
               (-> results serialize))) )

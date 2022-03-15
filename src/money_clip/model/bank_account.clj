@@ -4,7 +4,7 @@
             [money-clip.model.user :as u]))
 
 (s/def ::id (s/or :int nat-int? :nil nil?))
-(s/def ::user (s/or :user ::u/user :id nat-int?))
+(s/def ::user ::u/user)
 (s/def ::user-id (s/and nat-int? ut/required))
 (s/def ::name (s/and string? ut/required))
 (s/def ::bank-name (s/or :string string? :blank ut/blank?))

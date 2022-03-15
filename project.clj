@@ -28,6 +28,7 @@
    :uberjar {:aot :all}
    :profiles/dev {}
    :profiles/instrument {:injections [(require 'money-clip.utils)
+                                      (require 'money-clip.errors)
                                       (require 'money-clip.model.user)
                                       (require 'money-clip.model.bank-account)
                                       (require 'money-clip.persistence)
@@ -40,7 +41,10 @@
                   :resource-paths ["dev/resources"]
                   :dependencies   [[integrant/repl "0.3.2"]
                                    [ring/ring-mock "0.4.0"]
+                                   [ring/ring-spec "0.0.4"]
                                    [hawk "0.2.11"]
                                    [eftest "0.5.9"]
                                    [kerodon "0.9.1"]
-                                   [com.gearswithingears/shrubbery "0.4.1"]]}})
+                                   [com.gearswithingears/shrubbery "0.4.1"]
+                                   [metosin/muuntaja "0.6.8"]
+                                   [peridot "0.5.4"]]}})

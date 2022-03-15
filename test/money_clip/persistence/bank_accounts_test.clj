@@ -14,14 +14,18 @@
 (t/use-fixtures :each db/cleanup)
 
 (deftest create-bank-account-test
-  (let [user (users/create-user @db/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
-        bank-account (bank-accounts/create-bank-account @db/db (ba/new-bank-account user "Daily expenses" "IBANK"))]
-    (is (nat-int? (::ba/id bank-account)))
-    (is (= (dissoc user ::u/password) (::ba/user bank-account)))
-    (is (= "Daily expenses" (::ba/name bank-account)))
-    (is (= "IBANK" (::ba/bank-name bank-account)))
-    (is (inst? (::ba/created-at bank-account)))
-    (is (inst? (::ba/updated-at bank-account)))))
+  (let [user (users/create-user @db/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")]
+   (testing "when a bank account with the given name doesn't yet exist"
+    (let [bank-account (bank-accounts/create-bank-account @db/db (ba/new-bank-account user "Daily expenses" "IBANK"))]
+      (is (nat-int? (::ba/id bank-account)))
+      (is (= (dissoc user ::u/password) (::ba/user bank-account)))
+      (is (= "Daily expenses" (::ba/name bank-account)))
+      (is (= "IBANK" (::ba/bank-name bank-account)))
+      (is (inst? (::ba/created-at bank-account)))
+      (is (inst? (::ba/updated-at bank-account)))))
+  (testing "when a bank account with the given name already exists"
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"A bank account named `Daily expenses` already exists"
+                          (bank-accounts/create-bank-account @db/db (ba/new-bank-account user "Daily expenses" "IBANK")))))))
 
 (deftest find-bank-accounts-by-user-test
   (let [john (users/create-user @db/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
@@ -34,6 +38,18 @@
       (is (= (take 2 bank-accounts) (bank-accounts/find-bank-accounts-by-user @db/db john))))
     (testing "Jane's accounts"
     (is (= (take-last 1 bank-accounts) (bank-accounts/find-bank-accounts-by-user @db/db jane))))))
+
+(deftest find-bank-account-by-user-and-name-test
+  (let [john (users/create-user @db/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
+        jane (users/create-user @db/db (u/new-user "jane.doe@doe.net" "pa66w0rd" "Jane" "Doe") "pa66w0rd")
+        bank-accounts (mapv (partial bank-accounts/create-bank-account @db/db)
+                            [(ba/new-bank-account john "Daily expenses" "IBANK")
+                             (ba/new-bank-account john "Savings" "UBANK")
+                             (ba/new-bank-account jane "Savings" "UBANK")])]
+    (testing "when there's a bank account with the given name for the user"
+      (is (= (second bank-accounts) (bank-accounts/find-bank-account-by-user-and-name @db/db john "Savings"))))
+    (testing "when there's no bank account with the given name for the user"
+      (is (nil? (bank-accounts/find-bank-account-by-user-and-name @db/db jane "Daily expenses"))))))
 
 (deftest find-bank-account-by-id
   (let [user (users/create-user @db/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")

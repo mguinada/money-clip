@@ -37,6 +37,16 @@
   [r]
   (instance? java.util.regex.Pattern r))
 
+(defn throwable?
+  "Returns true if `t` is a Throwable"
+  [t]
+  (instance? java.lang.Throwable t))
+
+(defn exception-info?
+  "Returns true if `t` is a clojure.lang.ExceptionInfo"
+  [t]
+  (instance? clojure.lang.ExceptionInfo t))
+
 (defn replace
   "Like clojure.string/replace but it also works with keywords
 
@@ -100,6 +110,14 @@
 
 (s/fdef regexp?
   :args(s/cat :val any?)
+  :ret boolean?)
+
+(s/fdef throwable?
+  :args (s/cat :t any?)
+  :ret boolean?)
+
+(s/fdef exception-info?
+  :args (s/cat :t any?)
   :ret boolean?)
 
 (s/fdef replace

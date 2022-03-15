@@ -39,6 +39,20 @@
   (testing "is not a regexp"
     (is (false? (ut/regexp? "")))))
 
+(deftest throwable?-test
+  (testing "when it's an exception"
+    (let [error (java.lang.Error.)]
+      (is (true? (ut/throwable? error)))))
+  (testing "when it's not an exception"
+    (is (false? (ut/throwable? (java.lang.Object.))))))
+
+(deftest exception-info?-test
+  (testing "when it's an instance of `clojure.lang.ExceptionInfo`"
+    (let [error (clojure.lang.ExceptionInfo. "" {})]
+      (is (true? (ut/exception-info? error)))))
+  (testing "when it's an instance of `clojure.lang.ExceptionInfo`"
+    (is (false? (ut/exception-info? (java.lang.Object.))))))
+
 (deftest replace-test
   (testing "relaces a matched pattern in a keyword"
     (is (= :last-name (ut/replace :surename #"sure" "last-")))

@@ -21,4 +21,4 @@
     (fn [{[_ email password] :ataraxy/result}]
       (if-let [user (users/authenticate-user db email password)]
         [::response/ok {:user (ut/unqualify-keys (sign-token user))}]
-        [::response/forbidden "Not authorized"]))))
+        [::response/forbidden "Unauthorized"]))))

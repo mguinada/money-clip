@@ -1,7 +1,6 @@
 (ns money-clip.persistence.db
   (:require [clojure.java.io :as io]
             [integrant.core :as ig]
-            [integrant.repl :as repl]
             [duct.core :as duct]
             [clojure.java.jdbc :as jdbc]))
 
@@ -11,9 +10,10 @@
 
 (defn- init-system
   []
+  (duct/load-hierarchy)
   (-> (read-config) 
       duct/prep-config 
-      (ig/init [:duct.profile/test :duct.database/sql :duct.migrator/ragtime])))
+      (ig/init [:duct.profile/test :duct.handler/root :duct.database/sql :duct.migrator/ragtime])))
 
 (defn- truncate
   [{db :spec} & tables]
@@ -24,6 +24,7 @@
       (jdbc/execute! db [(str "TRUNCATE TABLE " table " CASCADE")]))))
 
 (def db (atom nil))
+(def app (atom nil))
 
 (defn init
   "Initializes the system so that we can interact with the test database.
@@ -32,9 +33,11 @@
    - https://clojurians.slack.com/archives/C5K1SHR6X/p1597695483350500"
   [test-fn]
   (let [system (init-system)]
+    (reset! app (:duct.handler/root system))
     (reset! db (:duct.database.sql/hikaricp system))
     (test-fn)
     (reset! db nil)
+    (reset! app nil)
     (ig/halt! system)))
 
 (defn cleanup

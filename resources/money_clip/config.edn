@@ -10,14 +10,14 @@
     [:money-clip.handler.users/login email password]
 
     [:post "/bank-accounts" {{:keys [name bank-name]} :body-params}]
-     ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name bank-name]}
+    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name bank-name]}
 
    :middleware
-   {:auth/authorize #ig/ref :money-clip.middleware/authorize
+   {:auth/authorize #ig/ref :money-clip.duct.middleware/authorize
     :auth/id #ig/ref :duct.middleware.buddy/authentication}}
 
   :duct.handler/root
-  {:middleware [#ig/ref :duct.middleware.buddy/authorization]}
+  {:middleware [#ig/ref :duct.middleware.buddy/authorization #ig/ref :money-clip.duct.middleware/error-handler]}
 
   :money-clip.handler.users/create
   {:db #ig/ref :duct.database/sql}
@@ -34,7 +34,9 @@
   :duct.middleware.buddy/authorization
   {:backend :jws}
 
-  :money-clip.middleware/authorize {}
+  :money-clip.duct.middleware/authorize {}
+
+  :money-clip.duct.middleware/error-handler {}
 
   :duct.migrator/ragtime
   {:migrations #ig/ref :duct.migrator.ragtime/resources}

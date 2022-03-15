@@ -4,6 +4,7 @@
             [integrant.core :as ig]
             [money-clip.mock :as mock]
             [shrubbery.core :as sh]
+            [money-clip.errors :as e]
             [money-clip.persistence.users :as users]
             [money-clip.handler.users]
             [money-clip.model.user :as u]
@@ -13,14 +14,41 @@
 
 (deftest create-user-test
   (let [data {:email "john.doe@doe.net" :password "pa66w0rd" :password-confirmation "pa66w0rd" :first-name "John" :last-name "Doe"}
-        user (-> data (assoc :id 1) (dissoc :password-confirmation) (ut/qualify-keys 'money-clip.model.user))
-        db (sh/mock users/Users {:create-user user})
-        handler (ig/init-key :money-clip.handler.users/create {:db db})
-        response (handler (-> (mock/request :post "/users" data)))]
-    (is (sh/received? db users/create-user (list (apply u/new-user (vals (dissoc data :password-confirmation))) (:password-confirmation data))) "creates the user")
-    (is (= :ataraxy.response/created (first response)) "HTTP response")
-    (is (= "/users/1" (second response)) "returns the path")
-    (is (= {:user (-> user (dissoc ::u/password) ut/unqualify-keys)} (nth response 2)) "returns the user")))
+        user (-> data (assoc :id 1) (dissoc :password-confirmation) (ut/qualify-keys 'money-clip.model.user))]
+    (testing "when the user's email has not been yet taken"
+      (let [db (sh/mock users/Users {:create-user user})
+            handler (ig/init-key :money-clip.handler.users/create {:db db})
+            response (handler (-> (mock/request :post "/users" data)))]
+        (is (sh/received? db users/create-user (list
+                                                (apply u/new-user (vals (dissoc data :password-confirmation)))
+                                                (:password-confirmation data))) "creates the user")
+        (is (= :ataraxy.response/created (first response)) "HTTP response")
+        (is (= "/users/1" (second response)) "returns the path")
+        (is (= {:user (-> user (dissoc ::u/password) ut/unqualify-keys)} (nth response 2)) "returns the user")))
+    (testing "when the user's email has already been taken"
+      (let [db (sh/mock users/Users {:create-user (sh/throws
+                                                   clojure.lang.ExceptionInfo
+                                                   "Email already taken"
+                                                   {:reason ::user-email-taken :data {:attribute :email :value (::u/email user)}})})
+            handler (ig/init-key :money-clip.handler.users/create {:db db})
+            response (handler (-> (mock/request :post "/users" data)))]
+        (is (sh/received? db users/create-user (list
+                                                (apply u/new-user (vals (dissoc data :password-confirmation)))
+                                                (:password-confirmation data))) "tries to create the user")
+        (is (= :ataraxy.response/precondition-failed (first response)) "HTTP response")
+        (is (= {:error "Email already taken"} (second response)) "returns an error")))
+    (testing "when the password don't match"
+      (let [db (sh/mock users/Users {:create-user (sh/throws
+                                                    clojure.lang.ExceptionInfo
+                                                    "Passwords don't match"
+                                                    {:reason ::passwords-dont-match :data {:attribute :password}})})
+            handler (ig/init-key :money-clip.handler.users/create {:db db})
+            response (handler (-> (mock/request :post "/users" data)))]
+        (is (sh/received? db users/create-user (list
+                                                (apply u/new-user (vals (dissoc data :password-confirmation)))
+                                                (:password-confirmation data))) "tries to create the user")
+        (is (= :ataraxy.response/precondition-failed (first response)) "HTTP response")
+        (is (= {:error "Password don't match"} (second response)) "returns an error")))))
 
 (deftest login-test
   (testing "when the provided credentials are valid"

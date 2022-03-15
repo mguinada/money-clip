@@ -1,11 +1,13 @@
-(ns money-clip.middleware-test
+(ns money-clip.duct.middleware-test
   (:require
    [clojure.test :refer [deftest testing is]]
    [ring.mock.request :as mock]
+   [ataraxy.response :as response]
    [buddy.sign.jwt :as jwt]
    [duct.middleware.buddy :as buddy]
    [integrant.core :as ig]
-   [money-clip.middleware :as middleware]))
+   [money-clip.errors :as e]
+   [money-clip.duct.middleware :as middleware]))
 
 (defn- app-handler [{:keys [identity]}]
   {:status 200, :headers {}, :body identity})
@@ -32,3 +34,17 @@
       (is (= {:status 401, :headers {}, :body "Unauthorized"}
              (handler (-> (mock/request :get "/")
                           (mock/header "authorization" (str "Token invalid-token")))))))))
+
+(deftest error-handler-test
+  (testing "when the error can be trasnlated into a response"
+    (let [error (e/uniqueness-violation-error "Value must be unique" ::value-not-unique {:attribute :name :value "Taken"})
+          erroring-handler (fn [_] (throw error))
+          middleware (ig/init-key ::middleware/error-handler {})
+          handler (-> erroring-handler middleware)]
+      (is (= {:status 412 :headers {} :body (e/ex-response error)} (handler (mock/request :put "/" {}))))))
+  (testing "when the error can not be trasnlated into a response"
+    (let [error (e/fatal-error "Something went wrong" ::something-went-wrong)
+          erroring-handler (fn [_] (throw error))
+          middleware (ig/init-key ::middleware/error-handler {})
+          handler (-> erroring-handler middleware)]
+      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Something went wrong" (handler (mock/request :put "/" {})))))))
