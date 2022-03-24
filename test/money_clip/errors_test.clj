@@ -2,7 +2,6 @@
   (:require
    [clojure.test :refer [deftest testing is]]
    [clojure.spec.test.alpha :as st]
-   [ataraxy.response :as response]
    [money-clip.errors :as e]))
 
 (st/instrument)

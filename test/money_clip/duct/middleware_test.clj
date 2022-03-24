@@ -2,7 +2,6 @@
   (:require
    [clojure.test :refer [deftest testing is]]
    [ring.mock.request :as mock]
-   [ataraxy.response :as response]
    [buddy.sign.jwt :as jwt]
    [duct.middleware.buddy :as buddy]
    [integrant.core :as ig]

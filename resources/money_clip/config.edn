@@ -9,8 +9,8 @@
     [:post "/login" {{:keys [email password]} :body-params}]
     [:money-clip.handler.users/login email password]
 
-    [:post "/bank-accounts" {{:keys [name bank-name]} :body-params}]
-    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name bank-name]}
+    [:post "/bank-accounts" {{:keys [name ?bank-name]} :body-params}]
+    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]}
 
    :middleware
    {:auth/authorize #ig/ref :money-clip.duct.middleware/authorize
@@ -32,11 +32,13 @@
   {:backend :jws :secret #duct/env "JWT_SECRET"}
 
   :duct.middleware.buddy/authorization
-  {:backend :jws}
+  {:backend :jws :unauthorized-handler #ig/ref :money-clip.duct.middleware/unauthorized-handler}
 
   :money-clip.duct.middleware/authorize {}
 
   :money-clip.duct.middleware/error-handler {}
+
+  :money-clip.duct.middleware/unauthorized-handler {}
 
   :duct.migrator/ragtime
   {:migrations #ig/ref :duct.migrator.ragtime/resources}

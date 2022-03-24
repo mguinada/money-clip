@@ -41,6 +41,9 @@
   [error]
   (-> error ex-data :data nil? not))
 
+(def ^:const unautorized {:error {:message "Unauthorized"}})
+(def ^:const permission-denied {:error {:message "Permission denied"}})
+
 (def uniqueness-violation-error (partial error ::uniqueness-violation-error true))
 (def password-dont-match-error (partial error ::password-dont-match-error true))
 (def fatal-error (partial error ::fatal-error false))

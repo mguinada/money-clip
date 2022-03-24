@@ -1,7 +1,6 @@
 (ns money-clip.handler.bank-accounts
   (:require [ataraxy.response :as response]
             [integrant.core :as ig]
-            [money-clip.errors :as e]
             [money-clip.model.user :as u]
             [money-clip.model.bank-account :as ba]
             [money-clip.persistence.users :as users]

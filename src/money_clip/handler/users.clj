@@ -5,7 +5,8 @@
             [tick.core :as t]
             [money-clip.utils :as ut]
             [money-clip.persistence.users :as users]
-            [money-clip.model.user :as u]))
+            [money-clip.model.user :as u]
+            [money-clip.errors :as e]))
 
 (defmethod ig/init-key ::create [_ {:keys [db]}]
   (fn [{[_ email password password-confirmation first-name last-name] :ataraxy/result}]
@@ -21,4 +22,4 @@
     (fn [{[_ email password] :ataraxy/result}]
       (if-let [user (users/authenticate-user db email password)]
         [::response/ok {:user (ut/unqualify-keys (sign-token user))}]
-        [::response/forbidden "Unauthorized"]))))
+        [::response/unauthorized e/unautorized]))))

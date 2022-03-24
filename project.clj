@@ -42,6 +42,7 @@
                   :dependencies   [[integrant/repl "0.3.2"]
                                    [ring/ring-mock "0.4.0"]
                                    [ring/ring-spec "0.0.4"]
+                                   [org.clojure/test.check "1.1.1"]
                                    [hawk "0.2.11"]
                                    [eftest "0.5.9"]
                                    [kerodon "0.9.1"]
