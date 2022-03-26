@@ -29,6 +29,6 @@
         (is (= {:bank-account (-> bank-account
                                   (assoc ::ba/id 1)
                                   (dissoc ::ba/user)
-                                  (assoc :_links {:self "/bank-accounts/1" :users (str "/users/" (::u/id user))})
+                                  (assoc :_links {:self "/bank-accounts/1" :user (str "/users/" (::u/id user))})
                                   ut/unqualify-keys)}
                (nth response 2)) "returns the bank account")))))

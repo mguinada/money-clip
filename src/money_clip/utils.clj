@@ -1,6 +1,7 @@
 (ns money-clip.utils
   "A collection of convenience functions"
   (:require [clojure.spec.alpha :as s]
+            [clojure.walk :as walk]
             [clojure.string :as str])
   (:refer-clojure :exclude [replace]))
 
@@ -80,25 +81,64 @@
   [k]
   (-> k name keyword))
 
+(defn nested-map?
+  "Returns true if `m` is a nested map"
+  [m]
+  {:pre [(map? m)]}
+  (boolean (some map? (map (fn [[_ v]] v) m))))
+
 (defn map-keys
   "Maps a function to the keys of a map"
   [f m]
+  {:pre [(fn? f) (map? m)]}
   (reduce-kv (fn [nm k v] (assoc nm (apply f [k]) v)) {} m))
+
+(defn map-values
+  "Maps a function to the keys of a map"
+  [f m]
+  {:pre [(fn? f) (map? m)]}
+  (reduce-kv (fn [nm k v] (assoc nm k (apply f [v]))) {} m))
+
+(defn transform-key-values
+  "Applies a tranformation by aplying `f` on `m` key value pairs
+
+   The `f` tranformer function receives the a vector with the key and the value as 1st and 2nd elements
+   and must return also a vector with the key as it's 1st element and the value as it 2nd.
+
+   ;; Ex.: keywordize a deep nested map:
+   (transform-key-values (fn [[k v]] [(keyword? k) v]) a-map)"
+  [f m]
+  {:pre [(fn? f) (map? m)]}
+  (walk/postwalk (fn [m] (if (map? m) (into {} (map f m)) m)) m))
 
 (defn qualify-keys
   "Turns a map's key into qualified keys.
    If some keys are already namespaced, it will be \"requalified\" to the given namespace."
   [m ns]
   (if-not (nil? m)
-    (map-keys #(qkey % ns) m)
+    (transform-key-values (fn [[k v]] [(qkey k ns) v]) m)
     nil))
 
 (defn unqualify-keys
   "Turns a map's key into unqualified keys."
   [m]
   (if-not (nil? m)
-    (map-keys unqkey m)
+    (transform-key-values (fn [[k v]] [(unqkey k) v]) m)
     nil))
+
+(defn vectorize
+  "Wraps val in a vector"
+  [val]
+  (if (coll? val)
+    (vec val)
+    (vector val)))
+
+(defn dissoc-in
+  "Dissociates a value in a nested associative structure"
+  [m [k & ks]]
+  (if ks
+    (update-in m (cons k (butlast ks)) dissoc (last ks))
+    (dissoc m k)))
 
 (s/fdef blank?
   :args (s/cat :val any?)
@@ -143,7 +183,19 @@
   :args (s/cat :keyword keyword?)
   :ret keyword?)
 
+(s/fdef nested-map?
+  :args (s/cat :map map?)
+  :ret boolean?)
+
 (s/fdef map-keys
+  :args (s/cat :f fn? :m map?)
+  :ret map?)
+
+(s/fdef map-values
+  :args (s/cat :f fn? :m map?)
+  :ret map?)
+
+(s/fdef transform-key-values
   :args (s/cat :f fn? :m map?)
   :ret map?)
 
@@ -154,3 +206,11 @@
 (s/fdef unqualify-keys
   :args (s/cat :map (s/or :map map? :nil nil?))
   :ret (s/or :map map? :nil nil?))
+
+(s/fdef vectorize
+  :args (s/cat :val any?)
+  :ret vector?)
+
+(s/fdef dissoc-in
+  :args (s/cat :m map? :v vector?)
+  :ret map?)

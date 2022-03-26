@@ -26,6 +26,10 @@
       (is (= "Doe" (::u/last-name user)))
       (is (true? (::u/active user))))))
 
+(deftest full-name-test
+  (let [user (u/user 1 "john.doe@doe.net" "pa66w0rd" "John" "Doe" true nil nil)]
+    (is (= "John Doe" (u/full-name user)))))
+
 (deftest authenticate-test
   (let [user (u/new-user "john.doe@doe.net" (hs/derive "pa66w0rd" {:alg :pbkdf2+sha512})  "John" "Doe")]
     (testing "when the password is valid"

@@ -62,6 +62,11 @@
   [{active ::active}]
   (true? active))
 
+(defn full-name
+  "Returns the user's full name"
+  [{first-name ::first-name last-name ::last-name}]
+  (str first-name " " last-name))
+
 (defn authenticate
   "Authenticates a user.
 
@@ -123,6 +128,10 @@
 (s/fdef active?
   :args (s/cat :user ::user)
   :ret (s/cat :boolean boolean?))
+
+(s/fdef full-name
+  :args (s/cat :user ::user)
+  :ret string?)
 
 (s/fdef authenticate
   :args (s/cat

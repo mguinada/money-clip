@@ -12,6 +12,7 @@
                  [org.postgresql/postgresql "42.2.19"]
                  [buddy/buddy-hashers "1.8.158"]
                  [buddy/buddy-sign "3.4.333"]
+                 [uritemplate-clj "1.3.1"]
                  [tick "0.4.32"]]
   :plugins [[duct/lein-duct "0.12.3"]
             [venantius/ultra "0.6.0"]]
@@ -28,6 +29,7 @@
    :uberjar {:aot :all}
    :profiles/dev {}
    :profiles/instrument {:injections [(require 'money-clip.utils)
+                                      (require 'money-clip.handler.restful.rest)
                                       (require 'money-clip.errors)
                                       (require 'money-clip.model.user)
                                       (require 'money-clip.model.bank-account)
