@@ -113,13 +113,26 @@
     (is (nil? (ut/unqualify-keys nil)))))
 
 (deftest vectorize-test
-  (testing "when the value is a collection"
-    (is (= [1] (ut/vectorize [1])))))
+  (testing "when the value is a vector"
+    (is (= [1 2 3] (ut/vectorize [1 2 3]))))
+  (testing "when the value is a list"
+    (is (= [1 2 3] (ut/vectorize (list 1 2 3)))))
+  (testing "when the value is a set"
+    (is (= [1 3 2] (ut/vectorize #{1 2 3}))))
+  (testing "when the value is a map"
+    (is (= [[:a 1] [:b 2] [:c 3]] (ut/vectorize {:a 1 :b 2 :c 3}))))
   (testing "when the value is not a collection"
-    (is (= [1] (ut/vectorize 1))))
+    (is (= [1] (ut/vectorize 1)))))
 
 (deftest dissoc-in-test
   (testing "when the path is a single element"
     (is (= {:b 2} (ut/dissoc-in {:a {:b 0 :c 1} :b 2} [:a]))))
   (testing "when the path is not a single element"
     (is (= {:a {:c 1}} (ut/dissoc-in {:a {:b 0 :c 1}} [:a :b])))))
+
+(deftest sort-map-keys-test
+  (let [m {:z 1 :b 2 :f 3 :a 4 :x 5}]
+    (testing "sorts a map's key using the key vector as criterion"
+      (is (= [:x :a :z :f :b] (-> (ut/sort-map-keys m [:x :a :z :f :b]) keys vec))))
+    (testing "keys that are present on the map but not in the ordering vector will be at the tail of the map"
+      (is (= [:x :a :z :f :b :w :y] ( -> (ut/sort-map-keys (assoc m :w 6 :y 7) [:x :a :z :f :b]) keys vec))))))

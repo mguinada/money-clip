@@ -18,6 +18,7 @@
   (create-bank-account [db bank-account])
   (find-bank-account-by-id [db id])
   (find-bank-accounts-by-user [db user])
+  (find-bank-account-by-user-and-id [db user id])
   (find-bank-account-by-user-and-name [db user name]))
 
 (defn- entities-to-ids
@@ -40,6 +41,9 @@
   (find-bank-accounts-by-user [{db :spec} {user-id ::u/id}]
     (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.user_id = ?", user-id])]
         (map serializer results)))
+  (find-bank-account-by-user-and-id [{db :spec} {user-id ::u/id} id]
+    (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.id = ? AND ba.user_id = ?", id, user-id])]
+      (-> results first serializer)))
   (find-bank-account-by-user-and-name [{db :spec} {user-id ::u/id} name]
     (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.name = ? AND ba.user_id = ?", name, user-id])]
       (-> results first serializer))))
@@ -67,4 +71,11 @@
          :db ::p/db
          :user ::u/user
          :name string?)
+  :ret (s/or :bank_acount ::ba/bank-account :nil nil?))
+
+(s/fdef find-bank-account-by-user-and-id
+  :args (s/cat
+         :db ::p/db
+         :user ::u/user
+         :id nat-int?)
   :ret (s/or :bank_acount ::ba/bank-account :nil nil?))

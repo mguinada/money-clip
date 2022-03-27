@@ -9,7 +9,7 @@
    (request method uri nil))
   ([method uri params]
    (-> (rm/request method uri params)
-       (assoc :body-params params 
+       (assoc :body-params params
               :ataraxy/result (->> params vals (cons nil) vec)))))
 
 (defn identity
@@ -18,10 +18,14 @@
       (assoc :identity id)))
 
 (s/fdef request
-  :args (s/cat
-         :method #{:get :post :put :head :delete}
-         :uri string?
-         :params (s/or :map map :nil nil?))
+  :args (s/alt
+         :arity-2 (s/cat
+                   :method #{:get :post :put :head :delete}
+                   :uri string?)
+         :arity-3 (s/cat
+                   :method #{:get :post :put :head :delete}
+                   :uri string?
+                   :params (s/or :map map :nil nil?)))
   :ret map?)
 
 (s/fdef identity

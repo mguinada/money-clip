@@ -10,7 +10,13 @@
     [:money-clip.handler.users/login email password]
 
     [:post "/bank-accounts" {{:keys [name ?bank-name]} :body-params}]
-    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]}
+    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]
+
+    [:get "/bank-accounts"]
+    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-accounts]
+
+    [:get "/bank-accounts/" id]
+    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-account ^int id]}
 
    :middleware
    {:auth/authorize #ig/ref :money-clip.duct.middleware/authorize
@@ -26,6 +32,12 @@
   {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
 
   :money-clip.handler.bank-accounts/create
+  {:db #ig/ref :duct.database/sql}
+
+  :money-clip.handler.bank-accounts/user-bank-accounts
+  {:db #ig/ref :duct.database/sql}
+
+  :money-clip.handler.bank-accounts/user-bank-account
   {:db #ig/ref :duct.database/sql}
 
   :duct.middleware.buddy/authentication

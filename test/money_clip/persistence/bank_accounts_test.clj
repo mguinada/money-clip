@@ -50,6 +50,18 @@
     (testing "when there's no bank account with the given name for the user"
       (is (nil? (bank-accounts/find-bank-account-by-user-and-name @system/db jane "Daily expenses"))))))
 
+(deftest find-bank-account-by-user-and-id-test
+  (let [john (users/create-user @system/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
+        jane (users/create-user @system/db (u/new-user "jane.doe@doe.net" "pa66w0rd" "Jane" "Doe") "pa66w0rd")
+        bank-accounts (mapv (partial bank-accounts/create-bank-account @system/db)
+                            [(ba/new-bank-account john "Daily expenses" "IBANK")
+                             (ba/new-bank-account john "Savings" "UBANK")
+                             (ba/new-bank-account jane "Savings" "UBANK")])]
+    (testing "when there's a bank account with the given id for the user"
+      (is (= (second bank-accounts) (bank-accounts/find-bank-account-by-user-and-id @system/db john (::ba/id (second bank-accounts))))))
+    (testing "when there's no bank account with the given id for the user"
+      (is (nil? (bank-accounts/find-bank-account-by-user-and-id @system/db jane (::ba/id (second bank-accounts))))))))
+
 (deftest find-bank-account-by-id
   (let [user (users/create-user @system/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
         bank-account (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Daily expenses" "IBANK"))]

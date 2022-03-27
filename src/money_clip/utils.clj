@@ -129,9 +129,10 @@
 (defn vectorize
   "Wraps val in a vector"
   [val]
-  (if (coll? val)
-    (vec val)
-    (vector val)))
+  (cond
+    (vector? val) val
+    (coll? val) (vec val)
+    :else (vector val)))
 
 (defn dissoc-in
   "Dissociates a value in a nested associative structure"
@@ -139,6 +140,17 @@
   (if ks
     (update-in m (cons k (butlast ks)) dissoc (last ks))
     (dissoc m k)))
+
+(defn sort-map-keys
+  "Sort a map by key taking `key-order` as the ordering criterion.
+   Keys that are present on the map but not in the ordering vector 
+   will be at the tail of the map.
+   "
+  [m key-order]
+  {:pre [(map? m) (vector? key-order)]}
+  (let [key-indexes (-> key-order (concat (vec (keys m))) distinct (zipmap (range)))
+        sorter (fn [x y] (< (get key-indexes x) (get key-indexes y)))]
+    (into (sorted-map-by sorter) m)))
 
 (s/fdef blank?
   :args (s/cat :val any?)
@@ -213,4 +225,8 @@
 
 (s/fdef dissoc-in
   :args (s/cat :m map? :v vector?)
+  :ret map?)
+
+(s/fdef sort-map-keys
+  :args (s/cat :m map? :key-order vector?)
   :ret map?)
