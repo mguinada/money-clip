@@ -3,9 +3,8 @@
 
 (defresource user
   :exclude [:password :active]
-  :links {:bank-accounts "/bank-accounts"})
+  :links {:self "/user" :bank-accounts "/bank-accounts"})
 
 (defresource bank-account
-  :include {:user_id [:user :id]}
-  :exclude [:user :user_id]
-  :links {:self "/bank-accounts/{id}"})
+  :exclude [:user]
+  :links {:self "/bank-accounts/{id}" :user "/user"})

@@ -23,3 +23,11 @@
       (if-let [user (users/authenticate-user db email password)]
         [::response/ok (r/user-resource (sign-token user))]
         [::response/unauthorized e/unautorized]))))
+
+(defmethod ig/init-key ::user [_ {:keys [db]}]
+  (fn [{{user-id ::u/id} :identity}]
+    (if-not (nil? user-id)
+      (if-let [user (users/find-user-by-id db user-id)]
+        [::response/ok (r/user-resource user)]
+        [::response/not-found])
+      [::response/unauthorized e/unautorized])))

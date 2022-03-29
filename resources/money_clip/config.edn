@@ -9,6 +9,9 @@
     [:post "/login" {{:keys [email password]} :body-params}]
     [:money-clip.handler.users/login email password]
 
+    [:get "/user"]
+    ^:auth/authorize ^:auth/id [:money-clip.handler.users/user]
+
     [:post "/bank-accounts" {{:keys [name ?bank-name]} :body-params}]
     ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]
 
@@ -30,6 +33,9 @@
 
   :money-clip.handler.users/login
   {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
+
+  :money-clip.handler.users/user
+  {:db #ig/ref :duct.database/sql}
 
   :money-clip.handler.bank-accounts/create
   {:db #ig/ref :duct.database/sql}

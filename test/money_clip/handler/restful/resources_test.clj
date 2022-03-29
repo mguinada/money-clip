@@ -16,7 +16,7 @@
              :last-name "Doe"
              :created-at timestamp
              :updated-at timestamp
-             :_links {:bank-accounts "/user/bank-accounts"}}}
+             :_links {:self "/user" :bank-accounts "/bank-accounts"}}}
            (r/user-resource user)))))
 
 (deftest bank-account-resource-test
@@ -28,5 +28,5 @@
              :bank-name "IBANK"
              :created-at timestamp
              :updated-at timestamp
-             :_links {:self "/bank-accounts/1"}}}
+             :_links {:self "/bank-accounts/1" :user "/user"}}}
            (r/bank-account-resource bank-account)))))

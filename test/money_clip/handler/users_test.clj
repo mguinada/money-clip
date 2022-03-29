@@ -12,7 +12,7 @@
 
 (st/instrument)
 
-(deftest create-user-test
+(deftest create-test
   (let [data {:email "john.doe@doe.net" :password "pa66w0rd" :password-confirmation "pa66w0rd" :first-name "John" :last-name "Doe"}
         user (-> data (assoc :id 1) (dissoc :password-confirmation) (ut/qualify-keys 'money-clip.model.user))]
     (testing "when the user's email has not been yet taken"
@@ -43,3 +43,27 @@
           response (handler (-> (mock/request :post "/login" data)))]
       (is (sh/received? db users/authenticate-user (vals data)) "Authenticates the user")
       (is (= :ataraxy.response/unauthorized (first response)) "HTTP response"))))
+
+(deftest user-test
+  (testing "when the user with the provided id exists"
+    (let [user (u/user 1 "john.doe@doe.net" "John" "Doe")
+          db (sh/mock users/Users {:find-user-by-id user})
+          handler (ig/init-key :money-clip.handler.users/user {:db db})
+          response (handler (-> (mock/request :get "/user") (mock/identity (select-keys user [::u/id ::u/email]))))]
+      (is (sh/received? db users/find-user-by-id [(::u/id user)]) "Fetches the user")
+      (is (= :ataraxy.response/ok (first response)) "HTTP response")
+      (is (= (r/user-resource user) (second response)) "Returns the user")))
+  (testing "when the user with the provided id does not exist"
+    (let [db (sh/mock users/Users {:find-user-by-id nil})
+          handler (ig/init-key :money-clip.handler.users/user {:db db})
+          response (handler (-> (mock/request :get "/user") (mock/identity {::u/id 999})))]
+      (is (sh/received? db users/find-user-by-id [999]) "Fetches the user")
+      (is (= :ataraxy.response/not-found (first response)) "HTTP response")
+      (is (nil? (second response)) "Does not return the user")))
+  (testing "when the user is unidentified"
+    (let [db (sh/mock users/Users {:find-user-by-id nil})
+          handler (ig/init-key :money-clip.handler.users/user {:db db})
+          response (handler (-> (mock/request :get "/user")))]
+      (is (not (sh/received? db users/find-user-by-id)) "Does not fetch the user")
+      (is (= :ataraxy.response/unauthorized (first response)) "HTTP response")
+      (is (= {:error {:message "Unauthorized"}} (second response)) "Returns an error"))))

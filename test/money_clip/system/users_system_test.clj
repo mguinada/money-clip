@@ -10,7 +10,7 @@
 (t/use-fixtures :once system/init)
 (t/use-fixtures :each system/cleanup)
 
-(deftest user-creation-test
+(deftest post-user-test
   (testing "when the email is not yet taken and the password and its confirmation match"
     (let [response (POST @system/app "/users" {:email "john.doe@doe.net"
                                                :password "pa66word"
@@ -27,7 +27,7 @@
                                                :last-name "Doe"})]
       (is (= 412 (http/status response)) "Serves a 412 HTTP status code")
       (is (= "Email already taken" (http/body response :error :message)) "Returns an error message")))
-  (testing "when the password and confirmation don't match"
+  (testing "when the password and the password confirmation don't match"
     (let [response (POST @system/app "/users" {:email "john.doe@doe.net"
                                                :password "pa66word"
                                                :password-confirmation "no-match"
@@ -36,7 +36,7 @@
       (is (= 412 (http/status response)) "Serves a 412 HTTP status code")
       (is (= "Passwords don't match" (http/body response :error :message)) "Returns an error message"))))
 
-(deftest user-login-test
+(deftest post-login-test
   (let [_ (POST @system/app "/users" {:email "john.doe@doe.net"
                                       :password "pa66word"
                                       :password-confirmation "pa66word"

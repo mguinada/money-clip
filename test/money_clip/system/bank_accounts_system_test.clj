@@ -9,7 +9,7 @@
 (t/use-fixtures :once system/init)
 (t/use-fixtures :each system/cleanup)
 
-(deftest create-bank-account-test
+(deftest post-bank-account-test
   (let [auth-token (system/create-user-and-login @system/app "test.user@users.com")]
     (testing "when the bank-account name is not taken"
       (let [response (POST @system/app "/bank-accounts" {:name "Savings"} :headers {"Authorization" (str "Token " auth-token)})]
