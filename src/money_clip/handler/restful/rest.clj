@@ -22,7 +22,7 @@
 (defn- process-links
   [resource links]
   (letfn [(linker [resource attr uri-template]
-                  (assoc-in resource [:_links attr] (uri/uritemplate uri-template resource)))]
+            (assoc-in resource [:_links attr] (uri/uritemplate uri-template resource)))]
     (reduce-kv linker resource links)))
 
 (defn resource

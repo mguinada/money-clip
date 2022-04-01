@@ -34,8 +34,8 @@
 
 (defmethod ig/init-key ::authorize
   [_ _]
- (fn [handler]
-   (wrap-authorization handler)))
+  (fn [handler]
+    (wrap-authorization handler)))
 
 (defmethod ig/init-key ::error-handler
   [_ _]

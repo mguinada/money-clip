@@ -3,6 +3,7 @@
             [duct.database.sql]
             [clojure.java.jdbc :as jdbc]
             [money-clip.errors :as e]
+            [money-clip.persistence.sql :as sql]
             [money-clip.persistence :as p]
             [money-clip.model.user :as u]
             [money-clip.model.bank-account :as ba]))
@@ -34,18 +35,20 @@
     (if-not (find-bank-account-by-user-and-name db-spec user bank-account-name)
       (let [results (jdbc/insert! db :bank_accounts (-> bank-account entities-to-ids p/underscore-keys))]
         (find-bank-account-by-id db-spec (-> results first :id)))
-      (throw (e/uniqueness-violation-error (str "A bank account named `" bank-account-name "` already exists") ::bank-account-name-taken {:attribute :name :value bank-account-name}))))
+      (throw (e/uniqueness-violation-error
+              (str "A bank account named `" bank-account-name "` already exists")
+              ::bank-account-name-taken {:attribute :name :value bank-account-name}))))
   (find-bank-account-by-id [{db :spec} id]
-    (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.id = ?", id])]
+    (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts.id id]) sql/format))]
       (-> results first serializer)))
   (find-bank-accounts-by-user [{db :spec} {user-id ::u/id}]
-    (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.user_id = ?", user-id])]
-        (map serializer results)))
+    (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts/user_id user-id]) sql/format))]
+      (map serializer results)))
   (find-bank-account-by-user-and-id [{db :spec} {user-id ::u/id} id]
-    (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.id = ? AND ba.user_id = ?", id, user-id])]
+    (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts/user_id user-id] [:= :bank_accounts.id id]) sql/format))]
       (-> results first serializer)))
   (find-bank-account-by-user-and-name [{db :spec} {user-id ::u/id} name]
-    (let [results (jdbc/query db ["SELECT ba.id, ba.user_id, ba.name, ba.bank_name, ba.created_at, ba.updated_at, u.email AS user_email, u.first_name AS user_first_name, u.last_name AS user_last_name, u.active AS user_active, u.created_at AS user_created_at, u.updated_at AS user_updated_at FROM bank_accounts AS ba JOIN users as u on u.id = ba.user_id WHERE ba.name = ? AND ba.user_id = ?", name, user-id])]
+    (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts/user_id user-id] [:= :bank_accounts.name name]) sql/format))]
       (-> results first serializer))))
 
 (s/fdef create-bank-account

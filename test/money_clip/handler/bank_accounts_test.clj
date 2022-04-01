@@ -9,8 +9,7 @@
             [money-clip.handler.users]
             [money-clip.model.user :as u]
             [money-clip.model.bank-account :as ba]
-            [money-clip.handler.restful.resources :as r]
-            [money-clip.utils :as ut]))
+            [money-clip.handler.restful.resources :as r]))
 
 (st/instrument)
 

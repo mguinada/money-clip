@@ -12,6 +12,7 @@
                  [org.postgresql/postgresql "42.2.19"]
                  [buddy/buddy-hashers "1.8.158"]
                  [buddy/buddy-sign "3.4.333"]
+                 [com.github.seancorfield/honeysql "2.2.868"]
                  [uritemplate-clj "1.3.1"]
                  [tick "0.4.32"]]
   :plugins [[duct/lein-duct "0.12.3"]
