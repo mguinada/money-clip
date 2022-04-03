@@ -1,6 +1,7 @@
 (ns money-clip.persistence.users-test
   (:require [clojure.test :refer [deftest testing is] :as t]
             [clojure.spec.test.alpha :as st]
+            [clojure.string :as str]
             [money-clip.system :as system]
             [money-clip.persistence.users :as users]
             [money-clip.model.user :as u]))
@@ -17,7 +18,10 @@
     (testing "when the user's password and it's confirmation do not match"
       (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Passwords don't match" (users/create-user @system/db user "does-not-match"))))
     (testing "when the user's email is already in use"
-      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Email already taken" (users/create-user @system/db user "pa66w0rd"))))))
+      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Email already taken"
+                            (users/create-user @system/db user "pa66w0rd")) "If the case matches")
+      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Email already taken"
+                            (users/create-user @system/db (update user ::u/email str/upper-case) "pa66w0rd")) "If the case does not match"))))
 
 (deftest find-user-by-id-test
   (testing "when the user with the given id exists"
@@ -31,7 +35,8 @@
   (testing "when the user with the given email exists"
     (let [new-user (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe")
           user (users/create-user @system/db new-user "pa66w0rd")]
-      (is (= user (users/find-user-by-email @system/db "john.doe@doe.net")))))
+      (is (= user (users/find-user-by-email @system/db "john.doe@doe.net")) "If the case matches")
+      (is (= user (users/find-user-by-email @system/db "John.Doe@doe.net")) "If the case doesn't match")))
   (testing "when the user with the given email doesn't exist"
     (is (nil? (users/find-user-by-email @system/db "jane.doe@doe.net")))))
 

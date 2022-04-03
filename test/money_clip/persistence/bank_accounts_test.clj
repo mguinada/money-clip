@@ -24,7 +24,9 @@
       (is (inst? (::ba/updated-at bank-account)))))
   (testing "when a bank account with the given name already exists"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"A bank account named `Daily expenses` already exists"
-                          (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Daily expenses" "IBANK")))))))
+                          (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Daily expenses" "IBANK"))) "If the case matches")
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"A bank account named `Daily expenses` already exists"
+                          (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Daily EXPENSES" "IBANK")))) "If the case doesn't match")))
 
 (deftest find-bank-accounts-by-user-test
   (let [john (users/create-user @system/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
@@ -46,7 +48,8 @@
                              (ba/new-bank-account john "Savings" "UBANK")
                              (ba/new-bank-account jane "Savings" "UBANK")])]
     (testing "when there's a bank account with the given name for the user"
-      (is (= (second bank-accounts) (bank-accounts/find-bank-account-by-user-and-name @system/db john "Savings"))))
+      (is (= (second bank-accounts) (bank-accounts/find-bank-account-by-user-and-name @system/db john "Savings")) "If the case matches")
+      (is (= (second bank-accounts) (bank-accounts/find-bank-account-by-user-and-name @system/db john "SaVinGs")) "If the case dosen't match"))
     (testing "when there's no bank account with the given name for the user"
       (is (nil? (bank-accounts/find-bank-account-by-user-and-name @system/db jane "Daily expenses"))))))
 

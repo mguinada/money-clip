@@ -1,5 +1,6 @@
 (ns money-clip.persistence.bank-accounts
   (:require [clojure.spec.alpha :as s]
+            [clojure.string :as str]
             [duct.database.sql]
             [clojure.java.jdbc :as jdbc]
             [money-clip.errors :as e]
@@ -32,12 +33,12 @@
   duct.database.sql.Boundary
   (create-bank-account [{db :spec :as db-spec} {user ::ba/user bank-account-name ::ba/name :as bank-account}]
     (p/check-spec! ::ba/bank-account bank-account)
-    (if-not (find-bank-account-by-user-and-name db-spec user bank-account-name)
-      (let [results (jdbc/insert! db :bank_accounts (-> bank-account entities-to-ids p/underscore-keys))]
-        (find-bank-account-by-id db-spec (-> results first :id)))
+    (if-let [{bank-account-name ::ba/name} (find-bank-account-by-user-and-name db-spec user bank-account-name)]
       (throw (e/uniqueness-violation-error
               (str "A bank account named `" bank-account-name "` already exists")
-              ::bank-account-name-taken {:attribute :name :value bank-account-name}))))
+              ::bank-account-name-taken {:attribute :name :value bank-account-name}))
+      (let [results (jdbc/insert! db :bank_accounts (-> bank-account entities-to-ids p/underscore-keys))]
+        (find-bank-account-by-id db-spec (-> results first :id)))))
   (find-bank-account-by-id [{db :spec} id]
     (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts.id id]) sql/format))]
       (-> results first serializer)))
@@ -48,7 +49,7 @@
     (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts/user_id user-id] [:= :bank_accounts.id id]) sql/format))]
       (-> results first serializer)))
   (find-bank-account-by-user-and-name [{db :spec} {user-id ::u/id} name]
-    (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts/user_id user-id] [:= :bank_accounts.name name]) sql/format))]
+    (let [results (jdbc/query db (-> sql/select-bank-accounts (sql/where [:= :bank_accounts/user_id user-id] [:= :%LOWER.name (str/lower-case name)]) sql/format))]
       (-> results first serializer))))
 
 (s/fdef create-bank-account

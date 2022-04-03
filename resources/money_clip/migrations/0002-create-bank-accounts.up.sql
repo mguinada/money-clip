@@ -8,4 +8,4 @@ CREATE TABLE bank_accounts (
 );
 
 CREATE UNIQUE INDEX bank_accounts_user ON bank_accounts (id, user_id);
-CREATE UNIQUE INDEX unique_name ON bank_accounts (name, user_id);
+CREATE UNIQUE INDEX unique_name ON bank_accounts ((LOWER(name)), user_id);
