@@ -3,20 +3,26 @@
 
   :duct.router/ataraxy
   {:routes
-   {[:post "/users" {{:keys [email password password-confirmation first-name last-name]} :body-params}]
-    [:money-clip.handler.users/create email password password-confirmation first-name last-name]
-
-    [:post "/login" {{:keys [email password]} :body-params}]
+   {[:post "/login" {{:keys [email password]} :body-params}]
     [:money-clip.handler.users/login email password]
+
+    [:post "/users" {{:keys [email password password-confirmation first-name last-name]} :body-params}]
+    [:money-clip.handler.users/create email password password-confirmation first-name last-name]
 
     [:get "/user"]
     ^:auth/authorize ^:auth/id [:money-clip.handler.users/user]
 
-    [:post "/bank-accounts" {{:keys [name ?bank-name]} :body-params}]
-    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]
+    [:put "/user" {{:keys [first-name last-name]} :body-params}]
+    ^:auth/authorize ^:auth/id [:money-clip.handler.users/update first-name last-name]
+
+    [:put "/user/change-password" {{:keys [current-password password password-confirmation]} :body-params}]
+    ^:auth/authorize ^:auth/id [:money-clip.handler.users/change-password current-password password password-confirmation]
 
     [:get "/bank-accounts"]
     ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-accounts]
+
+    [:post "/bank-accounts" {{:keys [name ?bank-name]} :body-params}]
+    ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]
 
     [:get "/bank-accounts/" id]
     ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-account ^int id]}
@@ -31,11 +37,17 @@
   :money-clip.handler.users/create
   {:db #ig/ref :duct.database/sql}
 
-  :money-clip.handler.users/login
-  {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
+  :money-clip.handler.users/update
+  {:db #ig/ref :duct.database/sql}
+
+  :money-clip.handler.users/change-password
+  {:db #ig/ref :duct.database/sql}
 
   :money-clip.handler.users/user
   {:db #ig/ref :duct.database/sql}
+
+  :money-clip.handler.users/login
+  {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
 
   :money-clip.handler.bank-accounts/create
   {:db #ig/ref :duct.database/sql}

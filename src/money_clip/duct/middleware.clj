@@ -6,7 +6,7 @@
 
 (defn- authenticate!
   [request]
-  (when-not (auth/authenticated? request) (auth/throw-unauthorized e/unautorized)))
+  (when-not (auth/authenticated? request) (auth/throw-unauthorized e/unauthorized)))
 
 (defn- wrap-authorization
   "Checks if the user is authenticated. If's it's not an HTTP status 401 Forbidden is issued.

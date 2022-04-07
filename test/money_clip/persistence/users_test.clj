@@ -51,3 +51,23 @@
       (is (nil? (users/authenticate-user @system/db "john.doe@doe.net" "invalid-passwd"))) "Returns nil")
     (testing "when the email and password are valid credentials yet the user is not active"
       (is (nil? (users/authenticate-user @system/db "jane.doe@doe.net" "pa66w0rd"))) "Returns nil")))
+
+(deftest update-user
+  (testing "when the update is successful"
+    (let [user (users/create-user @system/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
+          updated-user (users/update-user @system/db (assoc user ::u/last-name "Don" ::u/first-name "Joe"))]
+      (is (= "Don" (::u/last-name updated-user)) "Updates the last name")
+      (is (= "Joe" (::u/first-name updated-user)) "Updates the first name")
+      (is (not= (::u/created-at updated-user) (::u/updated-at updated-user)) "Touches the update timestamp")))
+  (testing "when the update is not successful"
+    (let [transient-user (u/new-user "jane.doe@doe.net" "pa66w0rd" "Jane" "Doe")]
+      (is (nil? (users/update-user @system/db (assoc transient-user ::u/id 123 ::u/first-name "Mary")))))))
+
+(deftest update-user-password
+  (let [user (users/create-user @system/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")]
+    (testing "when the current password and the password confirmation are both valid"
+      (is (= (::u/id user) (::u/id (users/update-user-password @system/db user "pa66w0rd" "Pa66wOrd" "Pa66wOrd")))))
+    (testing "when the current password is invalid"
+      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Authentication failed" (users/update-user-password @system/db user "wrong-pa66w0rd" "Pa66wOrd" "Pa66wOrd"))))
+    (testing "when the password confirmation does not match the password"
+      (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Passwords don't match" (users/update-user-password @system/db user "Pa66wOrd" "Pa66wOrd" "password"))))))

@@ -19,8 +19,7 @@
   ([type respondable msg reason]
    (error type respondable msg reason nil))
   ([type respondable msg reason data]
-   #_{:clj-kondo/ignore [:missing-else-branch]}
-   (if respondable (derive type ::respondable))
+   (when respondable (derive type ::respondable))
    (ex-info
     msg
     {:type type
@@ -41,11 +40,12 @@
   [error]
   (-> error ex-data :data nil? not))
 
-(def ^:const unautorized {:error {:message "Unauthorized"}})
+(def ^:const unauthorized {:error {:message "Unauthorized"}})
 (def ^:const permission-denied {:error {:message "Permission denied"}})
 
 (def uniqueness-violation-error (partial error ::uniqueness-violation-error true))
 (def passwords-dont-match-error (partial error ::passwords-dont-match-error true))
+(def invalid-password (partial error ::invalid-password-error true))
 (def fatal-error (partial error ::fatal-error false))
 
 (defn ex-response

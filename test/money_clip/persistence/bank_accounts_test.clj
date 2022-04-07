@@ -25,7 +25,7 @@
   (testing "when a bank account with the given name already exists"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"A bank account named `Daily expenses` already exists"
                           (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Daily expenses" "IBANK"))) "If the case matches")
-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"A bank account named `Daily expenses` already exists"
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"A bank account named `Daily EXPENSES` already exists"
                           (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Daily EXPENSES" "IBANK")))) "If the case doesn't match")))
 
 (deftest find-bank-accounts-by-user-test
@@ -72,3 +72,19 @@
       (is (= bank-account (bank-accounts/find-bank-account-by-id @system/db (::ba/id bank-account)))))
     (testing "when the account with the provided ID does not exist"
       (is (nil? (bank-accounts/find-bank-account-by-id @system/db 1))))))
+
+(deftest update-bank-account
+  (let [user (users/create-user @system/db (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") "pa66w0rd")
+        bank-account (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Daily expenses" "IBANK"))]
+    (testing "when another back account with the name to update to already exist"
+      (let [existging-bank-account (bank-accounts/create-bank-account @system/db (ba/new-bank-account user "Savings" "IBANK"))]
+        (is (thrown-with-msg? clojure.lang.ExceptionInfo #"A bank account named `Savings` already exists"
+                            (bank-accounts/update-bank-account @system/db user (assoc bank-account ::ba/name "Savings"))))))
+    (testing "when another bank account with the name to update is not taken"
+      (let [updated-bank-account (bank-accounts/update-bank-account @system/db user (assoc bank-account ::ba/name "Income" ::ba/bank-name "EBANK"))]
+        (is (= "Income" (::ba/name updated-bank-account)) "Updates the name")
+        (is (= "EBANK" (::ba/bank-name updated-bank-account)) "Updates the bank name")
+        (is (not= (::ba/created-at updated-bank-account) (::ba/updated-at updated-bank-account)) "Touches the update timestamp")))
+    (testing "when the bank account to update does not exist"
+      (let [transient-bank-account (ba/new-bank-account user "Joint account" "IBANK")]
+        (is (nil? (bank-accounts/update-bank-account @system/db user (assoc transient-bank-account ::ba/id 123 ::ba/bank-name "EBANK"))))))))

@@ -14,7 +14,7 @@
                  [buddy/buddy-sign "3.4.333"]
                  [com.github.seancorfield/honeysql "2.2.868"]
                  [uritemplate-clj "1.3.1"]
-                 [tick "0.4.32"]]
+                 [tick "0.5.0-RC5"]]
   :plugins [[duct/lein-duct "0.12.3"]
             [venantius/ultra "0.6.0"]]
   :main ^:skip-aot money-clip.main

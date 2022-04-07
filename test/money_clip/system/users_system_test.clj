@@ -10,7 +10,7 @@
 (t/use-fixtures :once system/init)
 (t/use-fixtures :each system/cleanup)
 
-(deftest post-user-test
+(deftest post-users-test
   (testing "when the email is not yet taken and the password and its confirmation match"
     (let [response (POST @system/app "/users" {:email "john.doe@doe.net"
                                                :password "pa66word"

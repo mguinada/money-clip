@@ -1,10 +1,16 @@
 (ns money-clip.persistence
   (:require [clojure.spec.alpha :as s]
+            [tick.core :as t]
             [money-clip.utils :as ut]))
 
 (s/def ::db (s/keys :req-un [::spec]))
 
 (def underscore-keys (partial ut/map-keys ut/underscore))
+
+(defn timestamp
+  []
+  (-> (System/currentTimeMillis)
+      (java.sql.Timestamp.)))
 
 (defn check-spec!
   "Checks if map `m` conforms to spec `s`."
