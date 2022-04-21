@@ -63,12 +63,15 @@
   ([app]
    (create-user-and-login app "test@users.net"))
   ([app email]
-   (let [create-user-response (POST app "/users" {:email email
-                                                  :password "pa66word"
-                                                  :password-confirmation "pa66word"
-                                                  :first-name "Test"
-                                                  :last-name "User"})
+   (create-user-and-login app email "Test" "User"))
+  ([app email first-name last-name]
+   (let [password "pa66word"
+         create-user-response (POST app "/users" {:email email
+                                                  :password password
+                                                  :password-confirmation password
+                                                  :first-name first-name
+                                                  :last-name last-name})
          login-user-response (POST app "/login" {:email email :password "pa66word"})]
      (assert (= 201 (http/status create-user-response)) "Failed to create user")
      (assert (= 200 (http/status login-user-response)) "Failed to login")
-     (http/body login-user-response :user :auth-token))))
+     [(http/body create-user-response :user) (http/body login-user-response :user :auth-token) password])))

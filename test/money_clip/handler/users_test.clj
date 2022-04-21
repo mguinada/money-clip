@@ -64,9 +64,8 @@
     (let [db (sh/mock users/Users {:find-user-by-id nil})
           handler (ig/init-key :money-clip.handler.users/user {:db db})
           response (handler (-> (mock/request :get "/user")))]
-      (is (not (sh/received? db users/find-user-by-id)) "Does not fetch the user")
-      (is (= :ataraxy.response/unauthorized (first response)) "HTTP response")
-      (is (= {:error {:message "Unauthorized"}} (second response)) "Returns an error"))))
+      (is (sh/received? db users/find-user-by-id) "Tries to fetch the user")
+      (is (= :ataraxy.response/not-found (first response)) "HTTP response"))))
 
 (deftest update-test
   (testing "when the user is updated"

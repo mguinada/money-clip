@@ -6,7 +6,7 @@
             [peridot.core :as p]
             [muuntaja.core :as m]))
 
-(defn- request
+(defn request
   "Wraps peridot `session` and `request`.
    This is basically a convenience function tailred for restfull request with JSON payloads."
   [method app uri body & {:keys [headers auth-token] :or {headers {} auth-token ""}}]
@@ -27,7 +27,7 @@
 (defn response
   "Returns the decoded response"
   [request]
-  (->> request :response))
+  (:response request))
 
 (defn status
   "Returns the response status"
@@ -55,7 +55,7 @@
          :method ::methods
          :app :ring/handler
          :uri string?
-         :body? map?
+         :body map?
          :kwargs (s/keys* :opt-un [::headers ::auth-token]))
   :ret :ring/response)
 

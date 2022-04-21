@@ -10,7 +10,7 @@
 (t/use-fixtures :each system/cleanup)
 
 (deftest post-bank-account-test
-  (let [auth-token (system/create-user-and-login @system/app "test.user@users.com")]
+  (let [[_ auth-token] (system/create-user-and-login @system/app "test.user@users.com")]
     (testing "when the bank-account name is not taken"
       (let [response (POST @system/app "/bank-accounts" {:name "Savings"} :headers {"Authorization" (str "Token " auth-token)})]
         (is (= 201 (http/status response)) "Creates the bank account")

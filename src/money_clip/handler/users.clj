@@ -26,11 +26,9 @@
 
 (defmethod ig/init-key ::user [_ {:keys [db]}]
   (fn [{{user-id ::u/id} :identity}]
-    (if-not (nil? user-id)
-      (if-let [user (users/find-user-by-id db user-id)]
-        [::response/ok (r/user-resource user)]
-        [::response/not-found])
-      [::response/unauthorized e/unauthorized])))
+    (if-let [user (users/find-user-by-id db user-id)]
+      [::response/ok (r/user-resource user)]
+      [::response/not-found])))
 
 (defmethod ig/init-key ::update [_ {:keys [db]}]
   (fn [{[_ first-name last-name] :ataraxy/result {user-id ::u/id} :identity}]
