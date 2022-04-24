@@ -9,4 +9,4 @@ CREATE TABLE users (
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX unique_email ON users (email);
+CREATE UNIQUE INDEX unique_email ON users (LOWER(email));

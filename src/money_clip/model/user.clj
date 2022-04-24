@@ -22,10 +22,12 @@
    password: (optional) sometimes we don't want to include the user's hashed password
    fist-name: the user's first name
    last-name: the user's last name
-   active: flag that mark a user as active
+   active: (optinal) flag that mark a user as active defaults to true
    created-at: (optional) usualy set by the persistence layer
    updated-at: (optional) usualy set by the persistence layer
    "
+  ([id email first-name last-name]
+   (user id email first-name last-name true nil nil))
   ([id email first-name last-name active]
    (user id email first-name last-name active nil nil))
   ([id email password first-name last-name active created-at updated-at]
@@ -60,6 +62,11 @@
   [{active ::active}]
   (true? active))
 
+(defn full-name
+  "Returns the user's full name"
+  [{first-name ::first-name last-name ::last-name}]
+  (str first-name " " last-name))
+
 (defn authenticate
   "Authenticates a user.
 
@@ -72,48 +79,59 @@
     nil))
 
 (s/fdef user
-  :args (s/alt :arity-one (s/cat
-                           :id ::id
-                           :email ::email
-                           :first-name ::first-name
-                           :last-name ::last-name
-                           :active ::active)
-               :arity-two (s/cat
-                           :id ::id
-                           :email ::email
-                           :first-name ::first-name
-                           :last-name ::last-name
-                           :active ::active
-                           :created-at ::created-at
-                           :updated-at ::updated-at)
-               :arity-three (s/cat
-                             :id ::id
-                             :email ::email
-                             :password ::password
-                             :first-name ::first-name
-                             :last-name ::last-name
-                             :active ::active
-                             :created-at ::created-at
-                             :updated-at ::updated-at))
+  :args (s/alt
+         :arity-4 (s/cat
+                   :id ::id
+                   :email ::email
+                   :first-name ::first-name
+                   :last-name ::last-name)
+         :arity-5 (s/cat
+                   :id ::id
+                   :email ::email
+                   :first-name ::first-name
+                   :last-name ::last-name
+                   :active ::active)
+         :arity-7 (s/cat
+                   :id ::id
+                   :email ::email
+                   :first-name ::first-name
+                   :last-name ::last-name
+                   :active ::active
+                   :created-at ::created-at
+                   :updated-at ::updated-at)
+         :arity-8 (s/cat
+                   :id ::id
+                   :email ::email
+                   :password ::password
+                   :first-name ::first-name
+                   :last-name ::last-name
+                   :active ::active
+                   :created-at ::created-at
+                   :updated-at ::updated-at))
   :ret ::user)
 
 (s/fdef new-user
-  :args (s/alt :arity-one (s/cat
-                           :email ::email
-                           :password ::password
-                           :first-name ::first-name
-                           :last-name ::last-name)
-               :arity-two (s/cat
-                           :email ::email
-                           :password ::password
-                           :first-name ::first-name
-                           :last-name ::last-name
-                           :active ::active))
+  :args (s/alt
+         :arity-4 (s/cat
+                   :email ::email
+                   :password ::password
+                   :first-name ::first-name
+                   :last-name ::last-name)
+         :arity-5 (s/cat
+                   :email ::email
+                   :password ::password
+                   :first-name ::first-name
+                   :last-name ::last-name
+                   :active ::active))
   :ret ::user)
 
 (s/fdef active?
   :args (s/cat :user ::user)
   :ret (s/cat :boolean boolean?))
+
+(s/fdef full-name
+  :args (s/cat :user ::user)
+  :ret string?)
 
 (s/fdef authenticate
   :args (s/cat

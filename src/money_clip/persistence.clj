@@ -1,7 +1,28 @@
 (ns money-clip.persistence
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [tick.core :as t]
+            [money-clip.utils :as ut]))
 
 (s/def ::db (s/keys :req-un [::spec]))
+
+(def underscore-keys (partial ut/map-keys ut/underscore))
+
+(defn timestamp
+  []
+  (-> (System/currentTimeMillis)
+      (java.sql.Timestamp.)))
+
+(defn check-spec!
+  "Checks if map `m` conforms to spec `s`."
+  [s m]
+  (if (= ::s/invalid (s/conform s m))
+    (throw (ex-info "Invalid entity"
+                    {:type ::spec-violation
+                     :spec s
+                     :cause (s/explain-str s m)
+                     :explain (s/explain-data s m)
+                     :invalid-data m}))
+    true))
 
 (defn serializer
   "Given a function that create a model and a list of keys

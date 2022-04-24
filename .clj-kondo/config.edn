@@ -1,0 +1,12 @@
+;; See https://github.com/clj-kondo/clj-kondo/blob/master/doc/linters.md for reference
+{:linters 
+ {:unresolved-var {:exclude [money-clip.http/GET
+                             money-clip.http/POST
+                             oney-clip.http/PUT
+                             money-clip.http/DELETE
+                             money-clip.handler.restful.resources]}
+  :unresolved-symbol {:exclude [(money-clip.handler.restful.rest)
+                                (money-clip.handler.restful.rest-test/bank-account-resource)]}
+  :unused-private-var {:exclude [money-clip.handler.restful.resources/user
+                                 money-clip.handler.restful.resources/bank-account]}}
+ :lint-as {money-clip.handler.restful.rest/defresource clojure.core/declare}}
