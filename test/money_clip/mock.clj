@@ -12,6 +12,12 @@
        (assoc :body-params params
               :ataraxy/result (->> params vals (cons nil) vec)))))
 
+(defn user
+  "Mocks the user attribution to the request performed via middelware"
+  [request user]
+  (-> request
+      (assoc :user user)))
+
 (defn identity
   [request id]
   (-> request

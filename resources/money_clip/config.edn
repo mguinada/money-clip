@@ -43,8 +43,7 @@
   :money-clip.handler.users/change-password
   {:db #ig/ref :duct.database/sql}
 
-  :money-clip.handler.users/user
-  {:db #ig/ref :duct.database/sql}
+  :money-clip.handler.users/user {}
 
   :money-clip.handler.users/login
   {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
@@ -64,7 +63,8 @@
   :duct.middleware.buddy/authorization
   {:backend :jws :unauthorized-handler #ig/ref :money-clip.duct.middleware/unauthorized-handler}
 
-  :money-clip.duct.middleware/authorize {}
+  :money-clip.duct.middleware/authorize
+  {:db #ig/ref :duct.database/sql}
 
   :money-clip.duct.middleware/error-handler {}
 
