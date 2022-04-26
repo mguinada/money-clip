@@ -24,20 +24,14 @@
         [::response/ok (r/user-resource (sign-token user))]
         [::response/unauthorized e/unauthorized]))))
 
-(defmethod ig/init-key ::user [_ {:keys [db]}]
-  (fn [{{user-id ::u/id} :identity}]
-    (if-let [user (users/find-user-by-id db user-id)]
-      [::response/ok (r/user-resource user)]
-      [::response/not-found])))
+(defmethod ig/init-key ::user [_ _]
+  (fn [{user :user}]
+    [::response/ok (r/user-resource user)]))
 
 (defmethod ig/init-key ::update [_ {:keys [db]}]
-  (fn [{[_ first-name last-name] :ataraxy/result {user-id ::u/id} :identity}]
-    (if-let [user (users/find-user-by-id db user-id)]
-      [::response/ok (r/user-resource (users/update-user db (assoc user ::u/first-name first-name ::u/last-name last-name)))]
-      [::response/not-found])))
+  (fn [{user :user [_ first-name last-name] :ataraxy/result}]
+    [::response/ok (r/user-resource (users/update-user db (assoc user ::u/first-name first-name ::u/last-name last-name)))]))
 
 (defmethod ig/init-key ::change-password [_ {:keys [db]}]
- (fn [{[_ current-password password password-confirmation] :ataraxy/result {user-id ::u/id} :identity}]
-   (if-let [user (users/find-user-by-id db user-id)]
-     [::response/ok (r/user-resource (users/update-user-password db user current-password password password-confirmation))]
-     [::response/not-found])))
+ (fn [{user :user [_ current-password password password-confirmation] :ataraxy/result}]
+     [::response/ok (r/user-resource (users/update-user-password db user current-password password password-confirmation))]))

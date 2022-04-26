@@ -50,7 +50,7 @@
         (when-not (= password password-confirmation) (throw (e/passwords-dont-match-error "Passwords don't match" ::passwords-dont-match {:attribute :password-confirmation})))
         (jdbc/execute! db (sql/update-user-password user-id (hs/derive password {:alg :pbkdf2+sha512}) (p/timestamp)))
         (find-user-by-id db-spec user-id))
-      (throw (e/invalid-password "Authentication failed" ::invalid-password {:attribute :current-password})))))
+      (throw (e/invalid-password-error "Authentication failed" ::invalid-password {:attribute :current-password})))))
 
 (s/fdef create-user
   :args (s/cat

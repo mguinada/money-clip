@@ -47,68 +47,31 @@
 (deftest user-test
   (testing "when the user with the provided id exists"
     (let [user (u/user 1 "john.doe@doe.net" "John" "Doe")
-          db (sh/mock users/Users {:find-user-by-id user})
-          handler (ig/init-key :money-clip.handler.users/user {:db db})
-          response (handler (-> (mock/request :get "/user") (mock/identity (select-keys user [::u/id ::u/email]))))]
-      (is (sh/received? db users/find-user-by-id [(::u/id user)]) "Fetches the user")
+          handler (ig/init-key :money-clip.handler.users/user {})
+          response (handler (-> (mock/request :get "/user") (mock/user user)))]
       (is (= :ataraxy.response/ok (first response)) "HTTP response")
-      (is (= (r/user-resource user) (second response)) "Returns the user")))
-  (testing "when the user with the provided id does not exist"
-    (let [db (sh/mock users/Users {:find-user-by-id nil})
-          handler (ig/init-key :money-clip.handler.users/user {:db db})
-          response (handler (-> (mock/request :get "/user") (mock/identity {::u/id 999})))]
-      (is (sh/received? db users/find-user-by-id [999]) "Fetches the user")
-      (is (= :ataraxy.response/not-found (first response)) "HTTP response")
-      (is (nil? (second response)) "Does not return the user")))
-  (testing "when the user is unidentified"
-    (let [db (sh/mock users/Users {:find-user-by-id nil})
-          handler (ig/init-key :money-clip.handler.users/user {:db db})
-          response (handler (-> (mock/request :get "/user")))]
-      (is (sh/received? db users/find-user-by-id) "Tries to fetch the user")
-      (is (= :ataraxy.response/not-found (first response)) "HTTP response"))))
+      (is (= (r/user-resource user) (second response)) "Returns the user"))))
 
 (deftest update-test
   (testing "when the user is updated"
     (let [user (u/user 1 "john.doe@doe.net" "John" "Doe")
           data {:first-name "Joe" :last-name "Moe"}
           updated-user (merge user (ut/qualify-keys data 'money-clip.model.user))
-          db (sh/mock users/Users {:find-user-by-id user :update-user updated-user})
+          db (sh/mock users/Users {:update-user updated-user})
           handler (ig/init-key :money-clip.handler.users/update {:db db})
-          response (handler (-> (mock/request :put "/user" data) (mock/identity (select-keys user [::u/id ::u/email]))))]
-      (is (sh/received? db users/find-user-by-id [(::u/id user)]) "Fetches the user")
+          response (handler (-> (mock/request :put "/user" data) (mock/user user)))]
       (is (sh/received? db users/update-user [updated-user]) "Updates the user")
       (is (= :ataraxy.response/ok (first response)) "HTTP response")
-      (is (= (r/user-resource updated-user) (second response)) "Returns the user")))
-  (testing "when the user is not found"
-    (let [user (u/user 1 "john.doe@doe.net" "John" "Doe")
-          data {:first-name "Joe" :last-name "Moe"}
-          db (sh/mock users/Users {:find-user-by-id nil})
-          handler (ig/init-key :money-clip.handler.users/update {:db db})
-          response (handler (-> (mock/request :put "/user" data) (mock/identity (select-keys user [::u/id ::u/email]))))]
-      (is (sh/received? db users/find-user-by-id [(::u/id user)]) "Fetches the user")
-      (is (not (sh/received? db users/update-user)) "Does not update the user")
-      (is (= :ataraxy.response/not-found (first response)) "HTTP response")
-      (is (nil? (second response)) "Does not returns the user"))))
+      (is (= (r/user-resource updated-user) (second response)) "Returns the user"))))
 
 (deftest update-password-test
   (testing "when the user password is updated"
     (let [user (-> (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") (assoc ::u/id 1))
           updated-user (assoc user ::u/password "n3w-pa660rd")
           data {:current-password "pa66w0rd" :new-password "n3w-pa660rd" :new-password-confirmaiton "n3w-pa660rd"}
-          db (sh/mock users/Users {:find-user-by-id user :update-user-password updated-user})
+          db (sh/mock users/Users {:update-user-password updated-user})
           handler (ig/init-key :money-clip.handler.users/change-password {:db db})
-          response (handler (-> (mock/request :put "/user/change-password" data) (mock/identity (select-keys user [::u/id ::u/email]))))]
-      (is (sh/received? db users/find-user-by-id [(::u/id user)]) "Fetches the user")
+          response (handler (-> (mock/request :put "/user/change-password" data) (mock/user user)))]
       (is (sh/received? db users/update-user-password (concat [user] (vals data))) "Updates the user's password")
       (is (= :ataraxy.response/ok (first response)) "HTTP response")
-      (is (= (r/user-resource updated-user) (second response)) "Returns the user")))
-  (testing "when the user is not found"
-    (let [user (-> (u/new-user "john.doe@doe.net" "pa66w0rd" "John" "Doe") (assoc ::u/id 1))
-          data {:current-password "pa66w0rd" :new-password "n3w-pa660rd" :new-password-confirmaiton "n3w-pa660rd"}
-          db (sh/mock users/Users {:find-user-by-id nil :update-user-password nil})
-          handler (ig/init-key :money-clip.handler.users/change-password {:db db})
-          response (handler (-> (mock/request :put "/user/change-password" data) (mock/identity (select-keys user [::u/id ::u/email]))))]
-      (is (sh/received? db users/find-user-by-id [(::u/id user)]) "Fetches the user")
-      (is (not (sh/received? db users/update-user-password)) "Does not update the password")
-      (is (= :ataraxy.response/not-found (first response)) "HTTP response")
-      (is (nil? (second response)) "Does not returns the user"))))
+      (is (= (r/user-resource updated-user) (second response)) "Returns the user"))))
