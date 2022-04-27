@@ -6,7 +6,7 @@
             [money-clip.handler.restful.resources :as r]))
 
 (defmethod ig/init-key ::create [_ {:keys [db]}]
-  (fn [{user :user [_ name bank-name] :ataraxy/result}]
+  (fn [{user :user {name :name bank-name :bank-name} :body-params}]
     (let [bank-account (bank-accounts/create-bank-account db (ba/new-bank-account user name bank-name))]
       [::response/created
        (str "/bank-accounts/" (::ba/id bank-account))
