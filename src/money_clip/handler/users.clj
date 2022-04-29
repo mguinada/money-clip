@@ -33,5 +33,5 @@
     [::response/ok (r/user-resource (users/update-user db (assoc user ::u/first-name first-name ::u/last-name last-name)))]))
 
 (defmethod ig/init-key ::change-password [_ {:keys [db]}]
- (fn [{user :user [_ current-password password password-confirmation] :ataraxy/result}]
-     [::response/ok (r/user-resource (users/update-user-password db user current-password password password-confirmation))]))
+  (fn [{user :user [_ current-password password password-confirmation] :ataraxy/result}]
+    [::response/ok (r/user-resource (users/update-user-password db user current-password password password-confirmation))]))
