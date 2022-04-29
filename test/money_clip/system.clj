@@ -34,12 +34,15 @@
    - https://clojurians.slack.com/archives/C5K1SHR6X/p1597695483350500"
   [test-fn]
   (let [system (init-system)]
-    (reset! app (:duct.handler/root system))
-    (reset! db (:duct.database.sql/hikaricp system))
-    (test-fn)
-    (reset! db nil)
-    (reset! app nil)
-    (ig/halt! system)))
+    (try
+      (reset! app (:duct.handler/root system))
+      (reset! db (:duct.database.sql/hikaricp system))
+      (test-fn)
+      (finally
+        (do
+          (reset! db nil)
+          (reset! app nil)
+          (ig/halt! system))))))
 
 (defn cleanup
   "Test fixture that truncates the database.
