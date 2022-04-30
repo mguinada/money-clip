@@ -32,8 +32,7 @@
    name: the name of the resource. Must be a keyword and it will be the root key of the resource.
    include: attributes to include on the resource.
    exclude: attributes to be exlucuded of the resource.
-   links: the HATEOAS links to be included on the resource.
-   "
+   links: the HATEOAS links to be included on the resource."
   [model name & {:keys [include exclude links attr-order] :or {include [] exclude [] links [] attr-order []}}]
   {:pre [(map? model) (keyword? name)]}
   (let [attr-order (if (empty? attr-order) (-> model ut/unqualify-keys keys vec) attr-order)

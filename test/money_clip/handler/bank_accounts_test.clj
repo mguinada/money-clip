@@ -12,7 +12,7 @@
 
 (st/instrument)
 
-(deftest create-bank-account-test
+(deftest create-test
   (let [data {:name "Savings" :bank-name "IBANK"}
         user (u/user 1 "john.doe@doe.net" "John" "Doe")
         bank-account (ba/new-bank-account user "Savings" "IBANK")

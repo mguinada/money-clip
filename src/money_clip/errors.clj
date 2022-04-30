@@ -14,8 +14,7 @@
    
    example:
 
-   (e/error :uniqueness-violation \"Email is taken\" ::email-taken {:attribute :email :value \"jdoe@doe.net\"}                                                                                                         
-   "
+   (e/error :uniqueness-violation \"Email is taken\" ::email-taken {:attribute :email :value \"jdoe@doe.net\"}"
   ([type respondable msg]
    (error type respondable msg type nil))
   ([type respondable msg reason]

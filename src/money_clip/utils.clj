@@ -144,8 +144,7 @@
 (defn sort-map-keys
   "Sort a map by key taking `key-order` as the ordering criterion.
    Keys that are present on the map but not in the ordering vector 
-   will be at the tail of the map.
-   "
+   will be at the tail of the map."
   [m key-order]
   {:pre [(map? m) (vector? key-order)]}
   (let [key-indexes (-> key-order (concat (vec (keys m))) distinct (zipmap (range)))

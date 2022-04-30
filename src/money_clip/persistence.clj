@@ -32,8 +32,7 @@
 
    (def to-model (p/serializer u/user :id :email :first_name :last_name :active :created_at :updated_at))
 
-   Will apply the provided keyword values of any given map to the `u/user` function.
-   "
+   Will apply the provided keyword values of any given map to the `u/user` function."
   [f & keys]
   (fn [[result]]
     (if-not (nil? result)
