@@ -24,8 +24,7 @@
    last-name: the user's last name
    active: (optinal) flag that mark a user as active defaults to true
    created-at: (optional) usualy set by the persistence layer
-   updated-at: (optional) usualy set by the persistence layer
-   "
+   updated-at: (optional) usualy set by the persistence layer"
   ([id email first-name last-name]
    (user id email first-name last-name true nil nil))
   ([id email first-name last-name active]
@@ -49,8 +48,7 @@
    password: a previsouly hashed password
    fist-name: the user's first name
    last-name: the user's last name
-   active: (optinal) flag that mark a user as active, defaults to true
-   "
+   active: (optinal) flag that mark a user as active, defaults to true"
   ([email password first-name last-name]
    (new-user email password first-name last-name true))
   ([email password first-name last-name active]

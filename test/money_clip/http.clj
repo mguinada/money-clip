@@ -38,8 +38,7 @@
 
 (defn body
   "Returns the response body.
-   Optionaly a list of keys can be proivided to project content from inside the body
-   "
+   Optionaly a list of keys can be proivided to project content from inside the body"
   [request & keys]
   (let [body (-> request response m/decode-response-body)]
     (if-not (empty? keys)
@@ -65,8 +64,7 @@
    
    example:
    
-   (POST @db/app \"/tasks\" {:description \"Do more clojure!\"})
-   "
+   (POST @db/app \"/tasks\" {:description \"Do more clojure!\"})"
   []
   (doseq [method (s/describe ::methods)]
     (eval
