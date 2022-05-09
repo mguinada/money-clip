@@ -54,3 +54,23 @@
             response (handler (-> (mock/request :get "/bank-accounts/" {:id 1}) (mock/user user)))]
         (is (sh/received? db bank-accounts/find-bank-account-by-user-and-id (list user (::ba/id bank-account))) "Fetches the bank account")
         (is (= :ataraxy.response/not-found (first response)) "HTTP response")))))
+
+(deftest update-user-bank-account-test
+  (let [user (u/user 1 "john.doe@doe.net" "John" "Doe")
+        bank-account (ba/bank-account 10 user "Savings" "IBANK")
+        updated-bank-account (assoc bank-account ::ba/name "Income" ::ba/bank-name "EBANK")]
+    (testing "when the user successfuly updates the bank account"
+      (let [db (sh/mock bank-accounts/BankAccounts {:find-bank-account-by-user-and-id bank-account :update-bank-account updated-bank-account})
+            handler (ig/init-key :money-clip.handler.bank-accounts/update {:db db})
+            response (handler (-> (mock/request :put "/bank-accounts" {:id (::ba/id bank-account) :name "Income" :bank-name "EBANK"}) (mock/user user)))]
+        (is (sh/received? db bank-accounts/find-bank-account-by-user-and-id [user (::ba/id bank-account)]) "Retrives the bank account")
+        (is (sh/received? db bank-accounts/update-bank-account [user updated-bank-account]) "Updates the bank account")
+        (is (= :ataraxy.response/ok (first response)) "HTTP response")
+        (is (= (r/bank-account-resource updated-bank-account) (second response)) "Serves the bank account")))
+    (testing "when the bank account is not found"
+      (let [db (sh/mock bank-accounts/BankAccounts {:find-bank-account-by-user-and-id nil :update-bank-account nil})
+            handler (ig/init-key :money-clip.handler.bank-accounts/update {:db db})
+            response (handler (-> (mock/request :put "/bank-accounts" {:id (::ba/id bank-account) :name "Income" :bank-name "EBANK"}) (mock/user user)))]
+        (is (sh/received? db bank-accounts/find-bank-account-by-user-and-id [user (::ba/id bank-account)]) "Tries to retrive the bank account")
+        (is (not (sh/received? db bank-accounts/update-bank-account)) "Does not try to update the bank account")
+        (is (= :ataraxy.response/not-found (first response)) "HTTP response")))))
