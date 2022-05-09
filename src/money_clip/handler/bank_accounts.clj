@@ -21,3 +21,9 @@
     (if-let [bank-account (bank-accounts/find-bank-account-by-user-and-id db user id)]
       [::response/ok (r/bank-account-resource bank-account)]
       [::response/not-found])))
+
+(defmethod ig/init-key ::update [_ {:keys [db]}]
+  (fn [{user :user [_ id name bank-name] :ataraxy/result}]
+    (if-let [bank-account (bank-accounts/find-bank-account-by-user-and-id db user id)]
+      [::response/ok (r/bank-account-resource (bank-accounts/update-bank-account db user (assoc bank-account ::ba/name name ::ba/bank-name bank-name)))]
+      [::response/not-found])))
