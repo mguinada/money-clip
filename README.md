@@ -28,6 +28,16 @@ lein duct setup
 This will create files for local configuration, and prep your system
 for the project.
 
+At `./dev/resources/local.edn` add your RDBMS username and password.
+
+```edn
+{:duct.database/sql
+ {:username "THE RDBMS USERNAME"
+  :password "THE RDBMS Password"}}
+```
+
+:warning: this file should never be present at your version control system.
+
 ### Environment
 
 To begin developing, start with a REPL.
