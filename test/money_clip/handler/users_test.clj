@@ -35,7 +35,7 @@
           response (handler (-> (mock/request :post "/login" data)))]
       (is (sh/received? db users/authenticate-user (vals data)) "Authenticates the user")
       (is (= :ataraxy.response/ok (first response)) "HTTP response")
-      (is (ut/not-blank? (get-in (second response) [:user :auth-token])) "Returns the user with an auth token")))
+      (is (ut/not-blank? (get-in (second response) [:user :auth_token])) "Returns the user with an auth token")))
   (testing "when the provided credetials are invalid"
     (let [data {:email "john.doe@doe.net" :password "wrong-password"}
           db (sh/mock users/Users {:authenticate-user nil})

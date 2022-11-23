@@ -12,21 +12,21 @@
     (is (= {:user
             {:id 1
              :email "john.doe@doe.net"
-             :first-name "John"
-             :last-name "Doe"
-             :created-at timestamp
-             :updated-at timestamp
-             :_links {:self "/user" :bank-accounts "/bank-accounts"}}}
+             :first_name "John"
+             :last_name "Doe"
+             :created_at timestamp
+             :updated_at timestamp
+             :_links {:self "/user" :bank_accounts "/bank-accounts"}}}
            (r/user-resource user)))))
 
 (deftest bank-account-resource-test
   (let [user (u/user 1 "john.doe@doe.net" "pa66w0rd" "John" "Doe" true timestamp timestamp)
         bank-account (ba/bank-account 1 user "Daily expenses" "IBANK" timestamp timestamp)]
-    (is (= {:bank-account
+    (is (= {:bank_account
             {:id 1
              :name "Daily expenses"
-             :bank-name "IBANK"
-             :created-at timestamp
-             :updated-at timestamp
+             :bank_name "IBANK"
+             :created_at timestamp
+             :updated_at timestamp
              :_links {:self "/bank-accounts/1" :user "/user"}}}
            (r/bank-account-resource bank-account)))))

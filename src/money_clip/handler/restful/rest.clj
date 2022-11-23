@@ -36,12 +36,14 @@
   [model name & {:keys [include exclude links attr-order] :or {include [] exclude [] links [] attr-order []}}]
   {:pre [(map? model) (keyword? name)]}
   (let [attr-order (if (empty? attr-order) (-> model ut/unqualify-keys keys vec) attr-order)
-        value (-> model
-                  ut/unqualify-keys
-                  (process-inclusions include)
-                  (process-links links)
-                  (process-exclusions exclude))]
-    {name (ut/sort-map-keys value attr-order)}))
+        resource (-> model
+                     ut/unqualify-keys
+                     (process-inclusions include)
+                     (process-links links)
+                     (process-exclusions exclude)
+                     (ut/sort-map-keys attr-order)
+                     (ut/underscore-keys))]
+    {(ut/underscore name) resource}))
 
 (defmacro defresource
   "Defines a REST resource.

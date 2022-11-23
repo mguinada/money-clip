@@ -112,7 +112,7 @@
   (walk/postwalk (fn [m] (if (map? m) (into {} (map f m)) m)) m))
 
 (defn qualify-keys
-  "Turns a map's key into qualified keys.
+  "Turns a map's keys into qualified keys.
    If some keys are already namespaced, it will be \"requalified\" to the given namespace."
   [m ns]
   (if-not (nil? m)
@@ -120,10 +120,24 @@
     nil))
 
 (defn unqualify-keys
-  "Turns a map's key into unqualified keys."
+  "Turns a map's keys into unqualified keys."
   [m]
   (if-not (nil? m)
     (transform-key-values (fn [[k v]] [(unqkey k) v]) m)
+    nil))
+
+(defn underscore-keys
+  "Turns a map's key into underscored keys"
+  [m]
+  (if-not (nil? m)
+    (transform-key-values (fn [[k v]] [(underscore k) v]) m)
+    nil))
+
+(defn dasherize-keys
+  "Turns a map's key into dasherized keys"
+  [m]
+  (if-not (nil? m)
+    (transform-key-values (fn [[k v]] [(dasherize k) v]) m)
     nil))
 
 (defn vectorize
@@ -215,6 +229,14 @@
   :ret (s/or :map map? :nil nil?))
 
 (s/fdef unqualify-keys
+  :args (s/cat :map (s/or :map map? :nil nil?))
+  :ret (s/or :map map? :nil nil?))
+
+(s/fdef underscore-keys
+  :args (s/cat :map (s/or :map map? :nil nil?))
+  :ret (s/or :map map? :nil nil?))
+
+(s/fdef dasherize-keys
   :args (s/cat :map (s/or :map map? :nil nil?))
   :ret (s/or :map map? :nil nil?))
 

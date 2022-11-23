@@ -112,6 +112,18 @@
   (testing "when given `nil` as a map"
     (is (nil? (ut/unqualify-keys nil)))))
 
+(deftest underscore-keys
+  (testing "underscores the keys of a map"
+    (is (= {:key_a 1 :key_b 2 :key_c {:key_d {:key_f 3}}} (ut/underscore-keys {:key-a 1 :key-b 2 :key-c {:key-d {:key-f 3}}})))
+  (testing "when given `nil` as a map"
+    (is (nil? (ut/underscore-keys nil))))))
+
+(deftest dasherize-keys
+  (testing "dasherizes the keys of a map"
+    (is (= {:key-a 1 :key-b 2 :key-c {:key-d {:key-f 3}}} (ut/dasherize-keys {:key_a 1 :key_b 2 :key_c {:key_d {:key_f 3}}})))
+  (testing "when given `nil` as a map"
+    (is (nil? (ut/underscore-keys nil))))))
+
 (deftest vectorize-test
   (testing "when the value is a vector"
     (is (= [1 2 3] (ut/vectorize [1 2 3]))))
