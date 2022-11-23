@@ -1,2 +1,2 @@
 {:duct.database/sql
- {:connection-uri "jdbc:postgresql://localhost:5432/money_clip_test"}}
+ {:jdbc-url "jdbc:postgresql://localhost:5432/money_clip_test"}}

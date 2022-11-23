@@ -8,13 +8,12 @@
             [money-clip.errors :as e]
             [money-clip.duct.middleware :as middleware]
             [money-clip.model.user :as u]
-            [money-clip.persistence.users :as users]))
-
-(defn- app-handler [{:keys [user]}]
-  {:status 200, :headers {}, :body {:user user}})
+            [money-clip.persistence.users :as users]
+            [ataraxy.response :as response]))
 
 (deftest authorize-test
-  (let [jwt-secret "secrettobekeptveryveryverysecret"
+  (let [app-handler (fn [{:keys [user]}] {:status 200, :headers {}, :body {:user user}})
+        jwt-secret "secrettobekeptveryveryverysecret"
         user (u/user 1 "john.doe@doe.net" "John" "Doe")
         middleware-authentication (ig/init-key ::buddy/authentication
                                                {:backend :jwe
@@ -67,3 +66,13 @@
           middleware (ig/init-key ::middleware/error-handler {})
           handler (-> erroring-handler middleware)]
       (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Something went wrong" (handler (mock/request :put "/" {})))))))
+
+(deftest dasherize-body-test
+  (testing "dasherizes the request body"
+    (let [data {:first_name "John" :last_name "Doe"}
+          dasherize-middleware (ig/init-key ::middleware/dasherize {})
+          format-middleware (ig/init-key :duct.middleware.web/format {})
+          app-handler (fn [{body-params :body-params}] {:status 200 :headers {} :body-params body-params})
+          handler (-> app-handler dasherize-middleware format-middleware)
+          response (handler (-> (mock/request :post "/") (mock/json-body data)))]
+      (is (= {:first-name "John" :last-name "Doe"} (:body-params response))))))

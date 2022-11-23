@@ -29,8 +29,7 @@
 
 (defn respondable?
   "Determins if the error is of a kind that the API should react 
-   to by serving a strcutured response or if it should let it bubble up the stack.
-   "
+   to by serving a structured response or if it should let it bubble up the stack."
   [error]
   (-> error
       ex-data

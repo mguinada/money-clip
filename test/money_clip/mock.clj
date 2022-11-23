@@ -12,6 +12,10 @@
        (assoc :body-params params
               :ataraxy/result (->> params vals (cons nil) vec)))))
 
+(def header rm/header)
+(def json-body rm/json-body)
+(def content-type rm/content-type)
+
 (defn user
   "Mocks the user attribution to the request performed via middelware"
   [request user]

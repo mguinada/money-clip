@@ -4,7 +4,8 @@
             [buddy.auth :as auth]
             [money-clip.errors :as e]
             [money-clip.model.user :as u]
-            [money-clip.persistence.users :as users]))
+            [money-clip.persistence.users :as users]
+            [money-clip.utils :as ut]))
 
 (defn- authenticate!
   "Authenticates the user  the performed the request.
@@ -29,7 +30,7 @@
 
 (defn- wrap-in-try-catch
   "Error handling middleware.
-   Wraps the handler in a try/catch block. If an error is raise and is
+   Wraps the handler in a try/catch block. If an error is raised and is
    cataloged as `respondable` and JSON response will be server, otherwise an exception will
    be raised."
   [handler]
@@ -38,6 +39,15 @@
      (e/try-catch (handler request)))
     ([request response raise]
      (e/try-catch (handler request response raise)))))
+
+(defn- wrap-in-dasherize
+  "Converts JSON based snake case keys to dasherized keys"
+  [handler]
+  (fn
+    ([request]
+     (handler (assoc request :body-params (ut/dasherize-keys (:body-params request)))))
+    ([request response raise]
+     (handler (assoc request :body-params (ut/dasherize-keys (:body-params request))) response raise))))
 
 (defmethod ig/init-key ::authorize
   [_ {:keys [db]}]
@@ -56,3 +66,8 @@
     (if (auth/authenticated? request)
       {:status 403 :headers {} :body e/access-denied}
       {:status 401 :headers {} :body error-data})))
+
+(defmethod ig/init-key ::dasherize
+  [_ _]
+  (fn [handler]
+    (wrap-in-dasherize handler)))
