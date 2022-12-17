@@ -13,7 +13,7 @@ CREATE DATABASE money_clip_development;
 CREATE DATABASE money_clip_test;
 ```
 
-Add an evironment var with a session secret key:
+Add an environment var with a session secret key:
 
 ```bash
 export JWT_SECRET=<secret>
@@ -28,15 +28,16 @@ lein duct setup
 This will create files for local configuration, and prep your system
 for the project.
 
-At `./dev/resources/local.edn` add your RDBMS username and password.
+At `./dev/resources/local.edn` add your Postgresql username and password.
+This sample assumes that your Postgresql password is stored at the environment variable `POSTGRES_PWD`.
 
 ```edn
 {:duct.database/sql
- {:username "THE RDBMS USERNAME"
-  :password "THE RDBMS Password"}}
+ {:username "postgres"
+  :password #duct/env "POSTGRES_PWD"}}
 ```
 
-:warning: this file should never be present at your version control system.
+:warning: this file should never be uploaded at your version control system.
 
 ### Environment
 

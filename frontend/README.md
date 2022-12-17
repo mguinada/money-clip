@@ -129,6 +129,12 @@ npm install
 npx shadow-cljs watch app
 ```
 
+or, alternatively
+
+```sh
+npm install && npx shadow-cljs watch app browser-test karma-test
+```
+
 Please be patient; it may take over 20 seconds to see any output, and over 40 seconds to complete.
 
 When `[:app] Build completed` appears in the output, browse to
