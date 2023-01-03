@@ -3,6 +3,8 @@
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.10.3"]
+                 [org.clojure/clojurescript "1.11.60"]
+                 [cheshire "5.11.0"]
                  [duct/core "0.8.0"]
                  [duct/module.ataraxy "0.3.0"]
                  [duct/module.logging "0.5.0"]
@@ -16,7 +18,13 @@
                  [uritemplate-clj "1.3.1"]
                  [tick "0.5.0-RC5"]]
   :plugins [[duct/lein-duct "0.12.3"]
+            [lein-cljsbuild "1.1.8"]
             [venantius/ultra "0.6.0"]]
+  :cljsbuild {
+    :builds [{:source-paths ["src/money_clip/utils.clj"]
+              :compiler {:output-to "../frontend/target/cljs-runtime"
+                         :optimizations :whitespace
+                         :pretty-print true}}]}
   :main ^:skip-aot money-clip.main
   :uberjar-name  "money-clip-standalone.jar"
   :resource-paths ["resources" "target/resources"]
