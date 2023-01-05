@@ -16,3 +16,27 @@ pom.xml.asc
 .clj-kondo/.cache
 .lsp
 .calva
+
+
+# frontend
+
+/out/
+/resources/public/js/compiled/
+/target/
+/*-init.clj
+/*.log
+
+# Node.js dependencies
+/node_modules/
+
+# shadow-cljs cache, port files
+/.shadow-cljs/
+
+# clj-kondo cache and configs from libs
+/.clj-kondo/*
+
+# clj-kondo config
+!/.clj-kondo/config.edn
+
+# clojure-lsp cache
+/.lsp/.cache
