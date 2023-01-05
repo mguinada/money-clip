@@ -17,6 +17,8 @@
                  [tick "0.5.0-RC5"]]
   :plugins [[duct/lein-duct "0.12.3"]
             [venantius/ultra "0.6.0"]]
+  :source-paths ["src/backend"]
+  :test-paths ["test/backend"]
   :main ^:skip-aot money-clip.main
   :uberjar-name  "money-clip-standalone.jar"
   :resource-paths ["resources" "target/resources"]
