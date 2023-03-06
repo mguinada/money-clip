@@ -13,7 +13,9 @@ CREATE DATABASE money_clip_development;
 CREATE DATABASE money_clip_test;
 ```
 
-Add an evironment var with a session secret key:
+Add an environment var with a session secret key:
+
+NOTE: See the [Creating a signed token section](https://rundis.github.io/blog/2015/buddy_auth_part1.html)
 
 ```bash
 export JWT_SECRET=<secret>
