@@ -1,12 +1,25 @@
 # money-clip
 
-FIXME: description
+Money-clip is a personal expense tracker
 
-
+## Table of contents
 
 [TOC]
 
-## Development environment setup
+## Technological stack
+
+Core technologies employed in the making of this project
+
+| Component | Homepage |
+| --------- | ---- |
+| Database     | [PostgreSQL 1.5.0](https://www.postgresql.org/)   |
+| Framework    | [Duct](https://github.com/duct-framework/duct) |
+| Authentication | [Buddy](https://github.com/funcool/buddy-core) |
+| Runtime | [Clojure](https://clojure.org/) |
+
+
+
+## Development
 
 When you first clone this repository, `cd` into the project and run:
 
@@ -41,7 +54,7 @@ Add an environment variable with a session secret key
 export JWT_SECRET=<secret>
 ```
 
-### Booting the development environment
+### Booting environment
 
 Start with a REPL.
 
