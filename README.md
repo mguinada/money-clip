@@ -1,21 +1,36 @@
 # money-clip
 
-Money-clip is a personal expense tracker
+`money-clip` is a personal expense tracker 
 
 ## Table of contents
 
 [TOC]
 
+
+
+## Application layers
+
+:information_source: _links point to each layer's README file_
+
+| Component         | Description |
+| ----------------- | ----------- |
+| Domain model      | The business bomain entities which encapsulate the business rules |
+| Persistence       | Persists the domain entities to the database |
+| Request handling  | Maps HTTP [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) URLs (routes) to actions |
+| Middleware | Pluggable infrastructure-bound actions |
+| Resource model |Maps domain entities to their [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) representation|
+
+
 ## Technological stack
 
 Core technologies employed in the making of this project
 
-| Component | Homepage |
-| --------- | ---- |
-| Database     | [PostgreSQL 1.5.0](https://www.postgresql.org/)   |
-| Framework    | [Duct](https://github.com/duct-framework/duct) |
+| Technology     | Homepage |
+| ---------------| -------- |
+| Database       | [PostgreSQL 1.5.0](https://www.postgresql.org/)   |
+| Framework      | [Duct](https://github.com/duct-framework/duct) |
 | Authentication | [Buddy](https://github.com/funcool/buddy-core) |
-| Runtime | [Clojure](https://clojure.org/) |
+| Runtime        | [Clojure](https://clojure.org/) |
 
 
 
