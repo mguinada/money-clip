@@ -2,11 +2,11 @@
 
 `money-clip` is a personal expense tracker 
 
-## Table of contents
+## Documentation
 
-[TOC]
+[API](https://mguinada.stoplight.io/docs/money-clip/branches/main/e9aa249dc9030-login)
 
-
+[Codebase](docs/index.html)
 
 ## Application layers
 

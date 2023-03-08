@@ -17,8 +17,10 @@
                  [uritemplate-clj "1.3.1"]
                  [tick "0.5.0-RC5"]]
   :plugins [[duct/lein-duct "0.12.3"]
+            [lein-codox "0.10.8"]
             [venantius/ultra "0.6.0"]]
   :main ^:skip-aot money-clip.main
+  :codox {:output-path "docs"}
   :uberjar-name  "money-clip-standalone.jar"
   :resource-paths ["resources" "target/resources"]
   :prep-tasks     ["javac" "compile" ["run" ":duct/compiler"]]
