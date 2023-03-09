@@ -1,4 +1,5 @@
 (ns money-clip.handler.users
+  "User request handlers"
   (:require [ataraxy.response :as response]
             [integrant.core :as ig]
             [buddy.sign.jwt :as jwt]

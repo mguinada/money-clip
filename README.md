@@ -6,19 +6,17 @@
 
 [API](https://mguinada.stoplight.io/docs/money-clip/branches/main/e9aa249dc9030-login)
 
-[Codebase](docs/index.html)
-
 ## Application layers
 
 :information_source: _links point to each layer's README file_
 
 | Component         | Description |
 | ----------------- | ----------- |
-| Domain model      | The business bomain entities which encapsulate the business rules |
-| Persistence       | Persists the domain entities to the database |
-| Request handling  | Maps HTTP [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) URLs (routes) to actions |
-| Middleware | Pluggable infrastructure-bound actions |
-| Resource model |Maps domain entities to their [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) representation|
+| [Request handling](/src/money_clip/handler/README.md) | Maps HTTP [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) URLs (routes) to actions |
+| [RESTful resource models](/src/money_clip/handler/restful/README.md) |Maps domain entities to their [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) representation|
+| [Middleware](/src/money_clip/duct/README.md) | Pluggable infrastructure-bound actions |
+| [Domain model](/src/money_clip/model/README.md) | The business domain entities which encapsulates the business rules |
+| [Persistence](/src/money_clip/persistence/README.md) | Persists the domain entities to the database |
 
 
 ## Technological stack
@@ -31,8 +29,6 @@ Core technologies employed in the making of this project
 | Framework      | [Duct](https://github.com/duct-framework/duct) |
 | Authentication | [Buddy](https://github.com/funcool/buddy-core) |
 | Runtime        | [Clojure](https://clojure.org/) |
-
-
 
 ## Development
 

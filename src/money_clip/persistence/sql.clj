@@ -1,4 +1,5 @@
 (ns money-clip.persistence.sql
+  "SQL statments and queries"
   (:require [clojure.core :as c]
             [honey.sql :as hsql]
             [honey.sql.helpers :refer [select select-distinct from
