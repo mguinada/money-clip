@@ -1,4 +1,5 @@
 (ns money-clip.handler.bank-accounts
+  "BankAcount request handlers"
   (:require [ataraxy.response :as response]
             [integrant.core :as ig]
             [money-clip.model.bank-account :as ba]

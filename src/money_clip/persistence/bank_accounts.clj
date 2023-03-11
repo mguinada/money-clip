@@ -1,4 +1,5 @@
 (ns money-clip.persistence.bank-accounts
+  "BankAccount model persistence"
   (:require [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [duct.database.sql]

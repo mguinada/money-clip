@@ -1,10 +1,54 @@
 # money-clip
 
-FIXME: description
+`money-clip` is a personal expense tracker 
 
-## Developing
+## Documentation
 
-### Setup
+[API](https://mguinada.stoplight.io/docs/money-clip/branches/main/e9aa249dc9030-login)
+
+## Application layers
+
+:information_source: _links point to each layer's README file_
+
+| Component         | Description |
+| ----------------- | ----------- |
+| [Request handling](/src/money_clip/handler/README.md) | Maps HTTP [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) URLs (routes) to actions |
+| [RESTful resource models](/src/money_clip/handler/restful/README.md) |Maps domain entities to their [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) representation|
+| [Middleware](/src/money_clip/duct/README.md) | Pluggable infrastructure-bound actions |
+| [Domain model](/src/money_clip/model/README.md) | The business domain entities which encapsulates the business rules |
+| [Persistence](/src/money_clip/persistence/README.md) | Persists the domain entities to the database |
+
+
+## Technological stack
+
+Core technologies employed in the making of this project
+
+| Technology     | Homepage |
+| ---------------| -------- |
+| Database       | [PostgreSQL 1.5.0](https://www.postgresql.org/)   |
+| Framework      | [Duct](https://github.com/duct-framework/duct) |
+| Authentication | [Buddy](https://github.com/funcool/buddy-core) |
+| Runtime        | [Clojure](https://clojure.org/) |
+
+## Development
+
+When you first clone this repository, `cd` into the project and run:
+
+```sh
+lein duct setup
+```
+
+This will create files for local configuration, and prepare your system for the project.
+
+At `dev/resources/local.edn` add your RDBMS username and password.
+
+:warning: this file should never be uploaded at your version control system.
+
+```edn
+{:duct.database/sql
+ {:username "THE RDBMS USERNAME"
+  :password "THE RDBMS PASSWORD"}}
+```
 
 Create the development and test databases at postgres RDBMS:
 
@@ -13,57 +57,36 @@ CREATE DATABASE money_clip_development;
 CREATE DATABASE money_clip_test;
 ```
 
-Add an environment var with a session secret key:
+Add an environment variable with a session secret key
 
-NOTE: See the [Creating a signed token section](https://rundis.github.io/blog/2015/buddy_auth_part1.html)
+:information_source: See the `Creating a signed token` section at [Securing Clojure Microservices using buddy - Part 1: Creating Auth Tokens](https://rundis.github.io/blog/2015/buddy_auth_part1.html)
 
 ```bash
 export JWT_SECRET=<secret>
 ```
 
-When you first clone this repository, run:
+### Booting environment
 
-```sh
-lein duct setup
-```
-
-This will create files for local configuration, and prep your system
-for the project.
-
-At `./dev/resources/local.edn` add your RDBMS username and password.
-
-```edn
-{:duct.database/sql
- {:username "THE RDBMS USERNAME"
-  :password "THE RDBMS Password"}}
-```
-
-:warning: this file should never be present at your version control system.
-
-### Environment
-
-To begin developing, start with a REPL.
+Start with a REPL.
 
 ```sh
 lein repl
 ```
 
-Then load the development environment.
+Load the development environment.
 
 ```clojure
 user=> (dev)
 :loaded
 ```
 
-Run `go` to prep and initiate the system.
+Run `go` to boot the app
 
 ```clojure
 dev=> (go)
 :duct.server.http.jetty/starting-server {:port 3000}
 :initiated
 ```
-
-By default this creates a web server at <http://localhost:3000>.
 
 When you make changes to your source files, use `reset` to reload any
 modified files and reset the server.
@@ -74,12 +97,11 @@ dev=> (reset)
 :resumed
 ```
 
-### Testing
-
-Testing is fastest through the REPL, as you avoid environment startup
-time.
+### Running the automated tests
 
 ```clojure
+user=> (dev)
+:loaded
 dev=> (test)
 ...
 ```
@@ -92,4 +114,4 @@ lein test
 
 ## Legal
 
-Copyright © 2022 FIXME
+Copyright © 2022 Miguel Guinada
