@@ -15,7 +15,8 @@
                  [buddy/buddy-sign "3.4.333"]
                  [com.github.seancorfield/honeysql "2.2.868"]
                  [uritemplate-clj "1.3.1"]
-                 [tick "0.5.0-RC5"]]
+                 [tick "0.5.0-RC5"]
+                 [org.clojure/clojurescript "1.16.0" "provided"]]
   :plugins [[duct/lein-duct "0.12.3"]
             [lein-codox "0.10.8"]
             [venantius/ultra "0.6.0"]]
@@ -23,7 +24,7 @@
   :test-paths ["test/clj"]
   :main ^:skip-aot money-clip.main
   :codox {:output-path "docs"}
-  :uberjar-name  "money-clip-standalone.jar"
+  :uberjar-name "money-clip-standalone.jar"
   :resource-paths ["resources" "target/resources"]
   :prep-tasks     ["javac" "compile" ["run" ":duct/compiler"]]
   :middleware     [lein-duct.plugin/middleware]
