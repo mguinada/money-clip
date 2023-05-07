@@ -19,6 +19,8 @@
   :plugins [[duct/lein-duct "0.12.3"]
             [lein-codox "0.10.8"]
             [venantius/ultra "0.6.0"]]
+  :source-paths ["src/clj"]
+  :test-paths ["test/clj"]
   :main ^:skip-aot money-clip.main
   :codox {:output-path "docs"}
   :uberjar-name  "money-clip-standalone.jar"
