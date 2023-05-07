@@ -7,29 +7,30 @@
     {["/login"] {[:post {{:keys [email password]} :body-params}]
                 [:money-clip.handler.users/login email password]}
 
-    ["/users"] {[:post {{:keys [email password password-confirmation first-name last-name]} :body-params}]
-                [:money-clip.handler.users/create email password password-confirmation first-name last-name]}
+     ["/users"] {[:post {{:keys [email password password-confirmation first-name last-name]} :body-params}]
+                 [:money-clip.handler.users/create email password password-confirmation first-name last-name]}
 
-    ["/user"] {[:get]
-               ^:auth/authorize ^:auth/id [:money-clip.handler.users/user]
+     ["/user"] {[:get]
+                ^:auth/authorize ^:auth/id [:money-clip.handler.users/user]
 
-               [:put {{:keys [first-name last-name]} :body-params}]
-               ^:auth/authorize ^:auth/id [:money-clip.handler.users/update first-name last-name]
+                [:put {{:keys [first-name last-name]} :body-params}]
+                ^:auth/authorize ^:auth/id [:money-clip.handler.users/update first-name last-name]
 
-               [:put "/change-password" {{:keys [current-password password password-confirmation]} :body-params}]
-               ^:auth/authorize ^:auth/id [:money-clip.handler.users/change-password current-password password password-confirmation]}
+                [:put "/change-password" {{:keys [current-password password password-confirmation]} :body-params}]
+                ^:auth/authorize ^:auth/id [:money-clip.handler.users/change-password current-password password password-confirmation]}
 
-    ["/bank-accounts"] {[:get]
-                        ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-accounts]
+     ["/bank-accounts"] {[:get]
+                         ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-accounts]
 
-                        [:post {{:keys [name ?bank-name]} :body-params}]
-                        ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]}
+                         [:post {{:keys [name ?bank-name]} :body-params}]
+                         ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/create name ?bank-name]}
 
-    ["/bank-accounts/"] {[:get ^int id]
-                         ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-account ^int id]
+     ["/bank-accounts/"] {[:get ^int id]
+                          ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-account ^int id]
 
                          [:put ^int id {{:keys [name bank-name]} :body-params}]
-                         ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/update ^int id name bank-name]}}}
+                         ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/update ^int id name bank-name]}}
+    ["/"] {[:get] [:money-clip.handler.web/index]}}
 
    :middleware {:auth/authorize #ig/ref :money-clip.duct.middleware/authorize
                 :auth/id #ig/ref :duct.middleware.buddy/authentication}}
@@ -62,6 +63,8 @@
   :money-clip.handler.bank-accounts/user-bank-account
   {:db #ig/ref :duct.database/sql}
 
+  :money-clip.handler.web/index {}
+
   :money-clip.handler.bank-accounts/update
   {:db #ig/ref :duct.database/sql}
 
@@ -92,5 +95,5 @@
  :duct.profile/prod  #duct/include "prod"
 
  :duct.module/logging {}
- :duct.module.web/api {}
- :duct.module/sql {}}
+ :duct.module/sql {}
+ :duct.module.web/api {}}
