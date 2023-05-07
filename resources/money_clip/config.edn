@@ -3,7 +3,8 @@
 
   :duct.router/ataraxy
   {:routes
-   {["/login"] {[:post {{:keys [email password]} :body-params}]
+   {"/api"
+    {["/login"] {[:post {{:keys [email password]} :body-params}]
                 [:money-clip.handler.users/login email password]}
 
     ["/users"] {[:post {{:keys [email password password-confirmation first-name last-name]} :body-params}]
@@ -28,7 +29,7 @@
                          ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-account ^int id]
 
                          [:put ^int id {{:keys [name bank-name]} :body-params}]
-                         ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/update ^int id name bank-name]}}
+                         ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/update ^int id name bank-name]}}}
 
    :middleware {:auth/authorize #ig/ref :money-clip.duct.middleware/authorize
                 :auth/id #ig/ref :duct.middleware.buddy/authentication}}
