@@ -5,4 +5,4 @@
 
 (defmethod ig/init-key :money-clip.handler.web/index [_ _]
   (fn [_]
-    [::response/ok (io/resource "money_clip/html/index.html")]))
+    [::response/ok (io/resource "money_clip/public/index.html")]))

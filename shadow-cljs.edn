@@ -1,0 +1,38 @@
+{:nrepl {:port 8777}
+ :jvm-opts ["-Xmx1G"]
+ :lein true
+ :dev-http
+ {8280 "resources/money_clip/public"
+  8290 "target/browser-test"}
+ :builds
+ {:app
+  {:target     :browser
+   :output-dir "resources/money_clip/public/js"
+   :asset-path "/js"
+   :modules
+   {:app {:init-fn money-clip.app/init}}
+   :devtools
+   {:preloads [day8.re-frame-10x.preload]
+    :http-root "resources/money_clip/public/"
+    :http-port 3000}
+   :tailwind/output "resources/money_clip/public/css/style.css"
+   :dev
+   {:compiler-options
+    {:closure-defines
+     {re-frame.trace.trace-enabled? true
+      day8.re-frame.tracing.trace-enabled? true}}
+    :build-hooks [(teknql.tailwind/start-watch!)]}
+   :release
+   {:build-options
+    {:ns-aliases
+     {day8.re-frame.tracing day8.re-frame.tracing-stubs}}
+    :build-hooks [(teknql.tailwind/compile-release!)]}}
+  :browser-test
+  {:target    :browser-test
+   :ns-regexp "-test$"
+   :runner-ns shadow.test.browser
+   :test-dir  "target/browser-test"}
+  :karma-test
+  {:target    :karma
+   :ns-regexp "-test$"
+   :output-to "target/karma-test.js"}}}
