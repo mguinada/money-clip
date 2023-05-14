@@ -30,7 +30,7 @@
 
                           [:put ^int id {{:keys [name bank-name]} :body-params}]
                           ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/update ^int id name bank-name]}}
-    ["/"] {[:get] ^:site [:money-clip.handler.web/index]}}
+    ["/"] {[:get] ^:site [:money-clip.handler.web/root] [:get ?path] ^:site [:money-clip.handler.web/site]}}
 
    :middleware {:site #ig/ref :duct.middleware.web/defaults
                 :auth/authorize #ig/ref :money-clip.duct.middleware/authorize
@@ -64,7 +64,8 @@
   :money-clip.handler.bank-accounts/user-bank-account
   {:db #ig/ref :duct.database/sql}
 
-  :money-clip.handler.web/index {}
+  :money-clip.handler.web/root {}
+  :money-clip.handler.web/path {}
 
   :duct.middleware.web/defaults {:params    {:urlencoded true, :multipart true, :nested true, :keywordize true}
                                  :cookies   true
