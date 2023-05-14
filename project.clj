@@ -19,7 +19,6 @@
                  [thheller/shadow-cljs "2.23.3"]
                  [reagent "1.2.0"]
                  [re-frame "1.3.0"]
-                 [thheller/shadow-cljs "2.23.3"]
                  [day8.re-frame/tracing "0.6.2"]
                  [day8.re-frame/http-fx "0.2.4"]
                  [com.teknql/shadow-cljs-tailwind-jit "1.0.0"]

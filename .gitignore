@@ -17,6 +17,8 @@ pom.xml.asc
 .lsp
 .calva
 /resources/money_clip/public/js/app.js
+resources/money_clip/public/js/manifest.edn
+resources/money_clip/public/css/style.css
 resources/money_clip/public/js/cljs-runtime/
 /node_modules/
 /.shadow-cljs/
