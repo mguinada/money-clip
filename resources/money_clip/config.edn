@@ -4,8 +4,8 @@
   :duct.router/ataraxy
   {:routes
    {"/api"
-    {["/login"] {[:post {{:keys [email password]} :body-params}]
-                 [:money-clip.handler.users/login email password]}
+    {["/login"] {[:post {{:keys [email password]} :body-params session :session}]
+                 [:money-clip.handler.users/login email password session]}
 
      ["/users"] {[:post {{:keys [email password password-confirmation first-name last-name]} :body-params}]
                  [:money-clip.handler.users/create email password password-confirmation first-name last-name]}
@@ -18,6 +18,9 @@
 
                 [:put "/change-password" {{:keys [current-password password password-confirmation]} :body-params}]
                 ^:auth/authorize ^:auth/id [:money-clip.handler.users/change-password current-password password password-confirmation]}
+
+     ["/session"] {[:get {session :session}]
+                   [:money-clip.handler.users/session session]}
 
      ["/bank-accounts"] {[:get]
                          ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-accounts]
@@ -52,6 +55,8 @@
 
   :money-clip.handler.users/user {}
 
+  :money-clip.handler.users/session {}
+
   :money-clip.handler.users/login
   {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}
 
@@ -67,11 +72,11 @@
   :money-clip.handler.web/root {}
   :money-clip.handler.web/site {}
 
-  :duct.middleware.web/defaults {:params    {:urlencoded true, :multipart true, :nested true, :keywordize true}
+  :duct.middleware.web/defaults {:params    {:urlencoded true :multipart true :nested true :keywordize true}
                                  :cookies   true
-                                 :session   {:flash false, :cookie-attrs {:http-only true, :same-site :strict}}
+                                 :session   {:flash false :cookie-attrs {:http-only true :same-site :strict :max-age 86400}}
                                  :security  {:anti-forgery         false
-                                             :xss-protection       {:enable? true, :mode :block}
+                                             :xss-protection       {:enable? true :mode :block}
                                              :frame-options        :sameorigin
                                              :content-type-options :nosniff}
                                  :static    {:resources ["money_clip/public" "duct/module/web/public"]}

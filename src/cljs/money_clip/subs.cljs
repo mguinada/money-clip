@@ -8,5 +8,18 @@
 
 (re-frame/reg-sub
  ::active-panel
- (fn [db _]
+ (fn [db]
    (:active-panel db)))
+
+(re-frame/reg-sub
+ ::user
+ (fn [db]
+   (:user db)))
+
+(re-frame/reg-sub
+ ::session
+ :<-[::user]
+ (fn [_ [user]]
+   (if (nil? user)
+     :authenticated
+     :anonymous)))

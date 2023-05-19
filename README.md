@@ -65,7 +65,7 @@ Add an environment variable with a session secret key
 export JWT_SECRET=<secret>
 ```
 
-### Booting environment
+### Booting the backend
 
 Start with a REPL.
 
@@ -110,6 +110,12 @@ But you can also run tests through Leiningen.
 
 ```sh
 lein test
+```
+
+### Booting the front end
+
+```sh
+npx shadow-cljs watch app
 ```
 
 ## Legal
