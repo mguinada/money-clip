@@ -8,7 +8,8 @@
 (re-frame/reg-event-db
  ::initialize-db
  (fn-traced [_ _]
-   db/default-db))
+   (-> db/default-db
+       (assoc :routes/current nil))))
 
 (re-frame/reg-event-fx
  ::initialize-app
@@ -16,20 +17,15 @@
    {:dispatch [::load-session]}))
 
 (re-frame/reg-event-fx
-  ::navigate
-  (fn-traced [_ [_ handler]]
-   {:navigate handler}))
+ ::navigate
+ (fn [_ [_ route]]
+   ;; See `navigate!` effect in routes.cljs
+   {:money-clip.routes/navigate! route}))
 
-(re-frame/reg-event-fx
- ::set-active-panel
- (fn-traced [{:keys [db]} [_ active-panel]]
-   {:db (assoc db :active-panel active-panel)}))
-
-(re-frame/reg-event-fx
+(re-frame/reg-event-db
  ::set-user
  (fn-traced [db [_ {:keys [user]}]]
-   {:db (assoc db :user user)
-    :dispatch [::navigate :home]}))
+   (assoc db :user user)))
 
 (re-frame/reg-event-db
  ::login-failure
@@ -38,7 +34,7 @@
 
 (re-frame/reg-event-fx
  ::login
- (fn-traced [db [_ email password]]
+ (fn-traced [{:keys [db]} [_ email password]]
    {:http-xhrio {:method :post
                  :uri "/api/login"
                  :params {:email email :password password}
@@ -50,7 +46,7 @@
 
 (re-frame/reg-event-fx
  ::load-session
- (fn-traced [db]
+ (fn-traced [{:keys [db]}]
    {:http-xhrio {:method :get
                  :uri "api/session"
                  :timeout 5000
@@ -60,13 +56,13 @@
 
 (re-frame/reg-event-fx
  ::set-session
- (fn-traced [db [_ {jwt :token}]]
-   (if-not (nil? jwt)
-     {:db (assoc db :jwt jwt)
-      :http-xhrio {:method :get
-                   :uri "api/user"
-                   :headers {:authorization (str "Token" " " jwt)}
-                   :timeout 5000
-                   :format (ajax/json-request-format)
-                   :response-format (ajax/json-response-format {:keywords? true})
-                   :on-success [::set-user]}})))
+ (fn-traced [{:keys [db]} [_ {jwt :token}]]
+            (if-not (nil? jwt)
+              {:db (assoc db :jwt jwt)
+               :http-xhrio {:method :get
+                            :uri "api/user"
+                            :headers {:authorization (str "Token" " " jwt)}
+                            :timeout 5000
+                            :format (ajax/json-request-format)
+                            :response-format (ajax/json-response-format {:keywords? true})
+                            :on-success [::set-user]}})))

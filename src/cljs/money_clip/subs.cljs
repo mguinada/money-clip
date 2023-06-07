@@ -7,19 +7,20 @@
    (:name db)))
 
 (re-frame/reg-sub
- ::active-panel
- (fn [db]
-   (:active-panel db)))
-
-(re-frame/reg-sub
  ::user
  (fn [db]
    (:user db)))
 
 (re-frame/reg-sub
- ::session
+ ::session-state
  :<-[::user]
- (fn [_ [user]]
+ (fn [user]
    (if (nil? user)
-     :authenticated
-     :anonymous)))
+     :anonymous
+     :authenticated)))
+
+(re-frame/reg-sub
+ ::user-authenticated?
+ :<-[::session-state]
+ (fn [session]
+   (= :authenticated session)))

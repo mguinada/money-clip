@@ -1,43 +1,67 @@
 (ns money-clip.routes
-  (:require [bidi.bidi :as bidi]
-            [pushy.core :as pushy]
+  (:require [reitit.core :as r]
+            [reitit.coercion :as rc]
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
+            [reitit.coercion.spec :as rss]
+            [reitit.frontend :as rf]
+            [reitit.frontend.controllers :as rfc]
+            [reitit.frontend.easy :as rfe]
             [re-frame.core :as re-frame]
-            [money-clip.events :as events]))
+            [money-clip.views.home :as home]))
 
-(defmulti panels identity)
-(defmethod panels :default [] [:div "No panel found for this route."])
+(re-frame/reg-event-db
+ ::navigated
+ (fn-traced [db [_ new-match]]
+   (let [old-match   (:routes/current db)
+         controllers (rfc/apply-controllers (:controllers old-match) new-match)]
+     (assoc db :routes/current (assoc new-match :controllers controllers)))))
 
-(def routes
-  (atom
-    ["/" {""        :home
-          "sign-in" :sign-in
-          "about"   :about}]))
-
-(defn parse
-  [url]
-  (bidi/match-route @routes url))
-
-(defn url-for
-  [& args]
-  (apply bidi/path-for (into [@routes] args)))
-
-(defn dispatch
-  [route]
-  (let [panel (keyword (str (name (:handler route)) "-panel"))]
-    (re-frame/dispatch [::events/set-active-panel panel])))
-
-(defonce history
-  (pushy/pushy dispatch parse))
-
-(defn navigate!
-  [handler]
-  (pushy/set-token! history (url-for handler)))
-
-(defn start!
-  []
-  (pushy/start! history))
+(re-frame/reg-sub
+ ::current-route
+ (fn-traced [db]
+   (:routes/current db)))
 
 (re-frame/reg-fx
-  :navigate
-  (fn [handler]
-    (navigate! handler)))
+ ::navigate!
+ (fn-traced [route]
+   (rfe/push-state route)))
+
+(defn href
+  "Return relative url for given route. Url can be used in HTML links."
+  ([k]
+   (href k nil nil))
+  ([k params]
+   (href k params nil))
+  ([k params query]
+   (rfe/href k params query)))
+
+(def routes
+  ["/"
+   [""
+    {:name :home
+     :view home/home
+     :link-text "Home"}]
+   ["sign-in"
+    {:name :sign-in
+     :view home/sign-in
+     :link-text "Sign in"}]
+   ["about"
+    {:name :about
+     :view home/about
+     :link-text "About"}]])
+
+(defn on-navigate [new-match]
+  (when new-match
+    (re-frame/dispatch [::navigated new-match])))
+
+(def router
+  (rf/router
+   routes
+   {:data {:coercion rss/coercion}}))
+
+(defn start! []
+  (js/console.log "Initializing routes")
+  (rfe/start!
+   router
+   on-navigate
+   {:use-fragment false}))

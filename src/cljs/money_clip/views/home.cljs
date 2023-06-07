@@ -2,28 +2,25 @@
   (:require [reagent.core :as r]
             [re-frame.core :as re-frame]
             [money-clip.events :as events]
-            [money-clip.routes :as routes]
             [money-clip.subs :as subs]))
 
-(defn home-panel []
+(defn home []
   (let [name (re-frame/subscribe [::subs/name])]
     [:div
      [:h1
       (str "Hello from " @name ". This is the Home Page.")]
      [:div
-      [:a {:on-click #(re-frame/dispatch [::events/navigate :about])} "go to About Page"]]]))
+      [:a {:on-click #(re-frame/dispatch [::events/navigate :about])} "go to About Page"]
+      [:br]
+      [:a {:on-click #(re-frame/dispatch [::events/navigate :sign-in])} "Sign-in"]]]))
 
-(defmethod routes/panels :home-panel [] [home-panel])
-
-(defn about-panel []
+(defn about []
   [:div
    [:h1 "This is the About Page."]
    [:div
     [:a {:on-click #(re-frame/dispatch [::events/navigate :home])} "go to Home Page"]]])
 
-(defmethod routes/panels :about-panel [] [about-panel])
-
-(defn sign-in-panel []
+(defn sign-in []
   (let [fields (r/atom {})]
     (fn []
       [:div#sign-in-form.flex.min-h-full.flex-col.justify-center.px-6.py-12.lg:px-8
@@ -48,9 +45,3 @@
          [:div
           [:button.flex.w-full.justify-center.rounded-md.bg-indigo-600.px-3.py-1.5.text-sm.font-semibold.leading-6.text-white.shadow-sm.hover:bg-indigo-500.focus-visible:outline.focus-visible:outline-2.focus-visible:outline-offset-2.focus-visible:outline-indigo-600
            {:type "submit"} "Sign in"]]]]])))
-
-(defmethod routes/panels :sign-in-panel [] [sign-in-panel])
-
-(defn main-panel []
-  (let [active-panel (re-frame/subscribe [::subs/active-panel])]
-    (routes/panels @active-panel)))

@@ -1,4 +1,6 @@
-(ns money-clip.views.navigation)
+(ns money-clip.views.navigation
+  (:require [re-frame.core :as re-frame]
+            [money-clip.subs :as subs]))
 
 (defn menu []
   [:div#menu.flex.items-center
@@ -61,10 +63,11 @@
      [:a#user-menu-item-2.block.px-4.py-2.text-sm.text-gray-700 {:href "#" :role "menuitem" :tabIndex "-1"} "Sign out"]]]])
 
 (defn navbar []
-  [:nav.bg-gray-800
-   [:div.mx-auto.max-w-7xl.px-4.sm:px-6.lg:px-8
-    [:div.flex.h-16.items-center.justify-between
-     [menu]
-     [:div.hidden.md:block [user-area]]
-     [:div.-mr-2.flex.md:hidden [mobile-menu-button]]]]
-   [mobile-menu]])
+  (let [user-authenticated? @(re-frame/subscribe [::subs/user-authenticated?])]
+    [:nav.bg-gray-800
+     [:div.mx-auto.max-w-7xl.px-4.sm:px-6.lg:px-8
+      [:div.flex.h-16.items-center.justify-between
+       (if user-authenticated? [menu])
+       [:div.hidden.md:block (if user-authenticated? [user-area])]
+       [:div.-mr-2.flex.md:hidden (if user-authenticated? [mobile-menu-button])]]]
+     (if user-authenticated? [mobile-menu])]))
