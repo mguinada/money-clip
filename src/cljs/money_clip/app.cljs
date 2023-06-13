@@ -3,7 +3,7 @@
             [re-frame.core :as re-frame]
             [money-clip.events :as events]
             [money-clip.routes :as routes]
-            [money-clip.views.navigation :refer [navbar]]
+            [money-clip.views.navigation :as nav]
             [money-clip.config :as config]))
 
 (defn dev-setup []
@@ -18,15 +18,11 @@
           (-> current-route :data :view))])]))
 
 (defn app []
-  [:div.min-h-full
-   [navbar]
-   [:header {:class "bg-white shadow"}
-    [:div {:class "mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"}
-     [:h1 {:class "text-3xl font-bold tracking-tight text-gray-900"} "Dashboard"]]]
-   [:main
-    [:div {:class "mx-auto max-w-7xl py-6 sm:px-6 lg:px-8"}
-     [:noscript "money|clip is a JavaScript app. Please enable JavaScript to continue."]
-     [router-component {:router routes/router}]]]])
+  [:div
+   [nav/navigation]
+   [:section {:class "section is-main-section"}
+    [:noscript "money|clip is a JavaScript app. Please enable JavaScript to continue."]
+    [router-component {:router routes/router}]]])
 
 (defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
