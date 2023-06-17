@@ -12,15 +12,22 @@
    (:user db)))
 
 (re-frame/reg-sub
+ ::session-loading?
+ (fn [db _]
+   (:session/loading? db)))
+
+(re-frame/reg-sub
  ::session-state
- :<-[::user]
- (fn [user]
-   (if (nil? user)
-     :anonymous
-     :authenticated)))
+ :<- [::user]
+ :<- [::session-loading?]
+ (fn [[user loading?]]
+   (cond
+     (true? loading?) :loading
+     user :authenticated
+     :else :anonymous)))
 
 (re-frame/reg-sub
  ::user-authenticated?
- :<-[::session-state]
+ :<- [::session-state]
  (fn [session]
    (= :authenticated session)))

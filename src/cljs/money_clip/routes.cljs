@@ -1,20 +1,44 @@
 (ns money-clip.routes
-  (:require [reitit.core :as r]
-            [reitit.coercion :as rc]
+  (:require [re-frame.core :as re-frame]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
+            [reitit.core :as r]
+            [reitit.coercion :as rc]
             [reitit.coercion.spec :as rss]
             [reitit.frontend :as rf]
             [reitit.frontend.controllers :as rfc]
             [reitit.frontend.easy :as rfe]
-            [re-frame.core :as re-frame]
             [money-clip.views.home :as home]))
+
+(def session-fencing
+  (re-frame/->interceptor
+   :id ::session-fencing
+   :comment "Enforces session fencing. i.e. it prevents an unauthenticated user to access
+             private screens and authenticated users from accessing pages that are exclusive
+             to unauthenticated users. e.g. the sign-in screen"
+   :before (fn [ctx]
+             (let [{{event :event db :db {user :user jwt :jwt} :db} :coeffects} ctx
+                   [event-key route] event
+                   {{route-name :name} :data} route]
+               (cond
+                 (:session/loading? db) ctx
+                 (and (some? user) (= :sign-in route-name)) (re-frame/dispatch [:money-clip.events/navigate :home])
+                 (and (nil? user) (not= :sign-in route-name)) (re-frame/dispatch [:money-clip.events/navigate :sign-in])
+                 :else ctx)))
+   :after (fn [{{db :db} :coeffects :as ctx}]
+            (if (:session/loading? db)
+              (assoc-in ctx [:effects :db :routes/current] nil)
+              ctx))))
 
 (re-frame/reg-event-db
  ::navigated
+ [session-fencing]
  (fn-traced [db [_ new-match]]
    (let [old-match   (:routes/current db)
-         controllers (rfc/apply-controllers (:controllers old-match) new-match)]
-     (assoc db :routes/current (assoc new-match :controllers controllers)))))
+         controllers (rfc/apply-controllers (:controllers old-match) new-match)
+         target-route (assoc new-match :controllers controllers)]
+     (-> db
+         (assoc :routes/requested target-route)
+         (assoc :routes/current target-route)))))
 
 (re-frame/reg-sub
  ::current-route

@@ -24,7 +24,7 @@
   (let [fields (r/atom {})]
     (fn []
       [:div.sign-in.container.columns
-       [:div.column.is-5.is-offset-2
+       [:div.column.is-6.is-offset-3
         [:form.box
          {:on-submit (fn [e]
                        (.preventDefault e)

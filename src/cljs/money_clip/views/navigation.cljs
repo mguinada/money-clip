@@ -197,7 +197,6 @@
       {:class "level-left"}
       [:div {:class "level-item"} [:h1 {:class "title"} "Dashboard"]]]
      [:div
-      ;; {:class "level-right", :style "display: none;"}
       {:class "level-right"}
       [:div {:class "level-item"}]]]]])
 

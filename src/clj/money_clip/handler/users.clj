@@ -20,13 +20,14 @@
             (if-not (nil? user)
               (->>
                {:exp (t/>> (t/now) (t/new-period 1 :days))}
-               (jwt/sign (select-keys user [::u/id ::u/email]) jwt-secret))
+               (jwt/sign (select-keys user [::u/id ::u/email]) jwt-secret)
+               (assoc user ::u/auth-token))
               nil))]
     (fn [{[_ email password session] :ataraxy/result}]
-      (if-let [token (-> (users/authenticate-user db email password) sign-token)]
-        (-> {:token token}
+      (if-let [user (-> (users/authenticate-user db email password) sign-token)]
+        (-> (r/user-resource (sign-token user))
             ring.util.http-response/ok
-            (assoc :session (assoc session :token token)))
+            (assoc :session (assoc session :token (::u/auth-token user))))
         [::response/unauthorized e/unauthorized]))))
 
 (defmethod ig/init-key ::user [_ _]
