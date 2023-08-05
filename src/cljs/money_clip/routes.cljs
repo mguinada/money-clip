@@ -14,16 +14,13 @@
    :id ::session-fencing
    :comment "Enforces session fencing. i.e. it prevents an unauthenticated user to access
              private screens and authenticated users from accessing pages that are exclusive
-             to unauthenticated users. e.g. the sign-in screen"
-   :before (fn [ctx]
-             (let [{{event :event db :db {user :user jwt :jwt} :db} :coeffects} ctx
-                   [event-key route] event
-                   {{route-name :name} :data} route]
-               (cond
-                 (:session/loading? db) ctx
-                 (and (some? user) (= :sign-in route-name)) (re-frame/dispatch [:money-clip.events/navigate :home])
-                 (and (nil? user) (not= :sign-in route-name)) (re-frame/dispatch [:money-clip.events/navigate :sign-in])
-                 :else ctx)))
+             for unauthenticated users. e.g. the sign-in screen"
+   :before (fn [{{[_ {{route-name :name} :data}] :event :as event {user :user :as db} :db} :coeffects :as ctx}]
+             (cond
+               (:session/loading? db) ctx
+               (and (some? user) (= :sign-in route-name)) (re-frame/dispatch [:money-clip.events/navigate :home])
+               (and (nil? user) (not= :sign-in route-name)) (re-frame/dispatch [:money-clip.events/navigate :sign-in])
+               :else ctx))
    :after (fn [{{db :db} :coeffects :as ctx}]
             (if (:session/loading? db)
               (assoc-in ctx [:effects :db :routes/current] nil)
