@@ -76,4 +76,4 @@
          login-user-response (POST app "/api/login" {:email email :password "pa66word"})]
      (assert (= 201 (http/status create-user-response)) "Failed to create user")
      (assert (= 200 (http/status login-user-response)) "Failed to login")
-     [(http/body create-user-response :user) (http/body login-user-response :token) password])))
+     [(http/body create-user-response :user) (http/body login-user-response :user :auth_token) password])))
