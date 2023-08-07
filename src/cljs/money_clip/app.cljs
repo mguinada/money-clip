@@ -20,9 +20,11 @@
 
 (defn splash []
   (when @(re-frame/subscribe [::subs/session-loading?])
-    [:div#splash-container
-     [:h1 "Welcome to money|clip!"]
-     [:p "Loading..."]]))
+    [:div#splash-container.columns
+     [:div.column.is-full.has-text-centered
+      [:h1 "Welcome to money|clip!"]
+      [:div.center {:style {:width "5em"}}
+       [:progress.progress.is-dark.is-small {:max 100} "30%"]]]]))
 
 (defn app []
   [:div
