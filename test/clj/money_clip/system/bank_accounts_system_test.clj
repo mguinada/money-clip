@@ -23,4 +23,4 @@
     (testing "when the user the authentication token is invalid"
       (let [response (POST @system/app "/api/bank-accounts" {:name "Savings"} :headers {"Authorization" (str "Token " "fake-auth-token")})]
         (is (= 401 (http/status response)) "Serves an HTTP status code")
-        (is (= "Unauthorized" (http/body response :error :message)) "Returns an error message")))))
+        (is (= "Invalid credentials" (http/body response :error :message)) "Returns an error message")))))

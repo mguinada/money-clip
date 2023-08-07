@@ -49,7 +49,7 @@
     (testing "when the login is invalid"
       (let [response (POST @system/app "/api/login" {:email "john.doe@doe.net" :password "wrong-password"})]
         (is (= 401 (http/status response)) "Serves a 401 HTTP status code")
-        (is (= "Unauthorized" (http/body response :error :message)) "Serves an error message")))))
+        (is (= "Invalid credentials" (http/body response :error :message)) "Serves an error message")))))
 
 (deftest get-user-test
   (let [[user auth-token] (system/create-user-and-login @system/app)]

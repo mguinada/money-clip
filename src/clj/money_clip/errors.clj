@@ -40,7 +40,7 @@
   [error]
   (-> error ex-data :data nil? not))
 
-(def ^:const unauthorized {:error {:message "Unauthorized"}})
+(def ^:const unauthorized {:error {:message "Invalid credentials"}})
 (def ^:const access-denied {:error {:message "Access denied"}})
 
 (def uniqueness-violation-error (partial error ::uniqueness-violation-error true))
