@@ -27,6 +27,12 @@
  (fn-traced [db [_ {:keys [user]}]]
    (assoc db :user user :session/loading? false)))
 
+(re-frame/reg-event-fx
+ ::login-success
+ (fn-traced [db [_ {:keys [user]}]]
+   {:db (assoc db :user user :session/loading? false)
+    :dispatch [::navigate :home]}))
+
 (re-frame/reg-event-db
  ::login-failure
  (fn-traced [db [_ {:keys [response]}]]
@@ -34,29 +40,20 @@
 
 (re-frame/reg-event-fx
  ::login
- (fn-traced [{:keys [db]} [_ email password]]
-   (ajax/POST "/api/login"
-     {:headers {"Accept" "application/json"}
-      :params {:email email :password password}
-      :format (ajax/json-request-format)
-      :response-format (ajax/json-response-format {:keywords? true})
-      :handler (fn [response]
-                 (re-frame/dispatch-sync [::set-user response])
-                 (re-frame/dispatch [::navigate :home]))
-      :error-handler (fn [response]
-                        (re-frame/dispatch-sync [::login-failure response]))})))
-
-(re-frame/reg-event-db
- ::post-session-redirect
- (fn-traced [db]
-   (re-frame/dispatch [::navigate (get-in db [:routes/requested :data :name])])))
+ (fn-traced [_ [_ email password]]
+   {:http-xhrio {:method :post
+                 :uri "/api/login"
+                 :params {:email email :password password}
+                 :format (ajax/json-request-format)
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success [::login-success]
+                 :on-failure [::login-failure]}}))
 
 (re-frame/reg-event-fx
  ::load-session
- (fn-traced [{:keys [db]}]
+ (fn-traced [_ _]
    {:http-xhrio {:method :get
                  :uri "api/session"
-                 :timeout 5000
                  :format (ajax/json-request-format)
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success [::set-session]
@@ -64,20 +61,29 @@
 
 (re-frame/reg-event-fx
  ::set-session
- (fn-traced [{:keys [db]} [_ {jwt :token :as args}]]
-            (if (some? jwt)
-              (ajax/GET "api/user"
-                :headers {:accept "application/json" :authorization (str "Token" " " jwt)}
-                :format (ajax/json-request-format)
-                :response-format (ajax/json-response-format {:keywords? true})
-                :handler (fn [response]
-                           (re-frame/dispatch-sync [::set-user response jwt])
-                           (re-frame/dispatch-sync [::post-session-redirect])))
-              (re-frame/dispatch [::no-session]))))
+ (fn-traced [_ [_ {jwt :token :as args}]]
+   {:http-xhrio {:method :get
+                 :uri "api/user"
+                 :headers {:accept "application/json" :authorization (str "Token" " " jwt)}
+                 :format (ajax/json-request-format)
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success [::session-ok]
+                 :on-failure [::no-session]}}))
 
+(re-frame/reg-event-fx
+ ::session-ok
+ (fn-traced [{:keys [db]} [_ {:keys [user]}]]
+            (js/console.log "session-ok user" user)
+            {:db (assoc db :user user :session/loading? false)
+             :dispatch [::post-session-redirect]}))
 
 (re-frame/reg-event-fx
  ::no-session
- (fn-traced [{:keys [db]}]
+ (fn-traced [{:keys [db]} _]
    {:db (assoc db :session/loading? false)
     :dispatch [::navigate :sign-in]}))
+
+(re-frame/reg-event-fx
+ ::post-session-redirect
+ (fn-traced [{:keys [db]} _]
+   {:dispatch [::navigate (get-in db [:routes/requested :data :name])]}))
