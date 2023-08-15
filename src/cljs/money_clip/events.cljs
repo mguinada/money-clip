@@ -24,14 +24,13 @@
 
 (re-frame/reg-event-db
  ::set-user
- (fn-traced [db [_ {:keys [user]}]]
+ (fn-traced [db [_ user]]
    (assoc db :user user :session/loading? false)))
 
 (re-frame/reg-event-fx
  ::login-success
  (fn-traced [db [_ {:keys [user]}]]
-   {:db (assoc db :user user :session/loading? false)
-    :dispatch [::navigate :home]}))
+   {:dispatch-n [[::set-user _ user] [::navigate :home]]}))
 
 (re-frame/reg-event-db
  ::login-failure
@@ -67,15 +66,13 @@
                  :headers {:accept "application/json" :authorization (str "Token" " " jwt)}
                  :format (ajax/json-request-format)
                  :response-format (ajax/json-response-format {:keywords? true})
-                 :on-success [::session-ok]
+                 :on-success [::session-init]
                  :on-failure [::no-session]}}))
 
 (re-frame/reg-event-fx
- ::session-ok
+ ::session-init
  (fn-traced [{:keys [db]} [_ {:keys [user]}]]
-            (js/console.log "session-ok user" user)
-            {:db (assoc db :user user :session/loading? false)
-             :dispatch [::post-session-redirect]}))
+   {:dispatch-n [[::set-user _ user] [::post-session-redirect]]}))
 
 (re-frame/reg-event-fx
  ::no-session
