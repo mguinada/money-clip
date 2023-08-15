@@ -10,9 +10,9 @@
             [money-clip.views.home :as home]))
 
 (def session-fencing
-   "Enforces session fencing. i.e. it prevents an unauthenticated user to access
-    private screens and authenticated users from accessing pages that are exclusive
-    for unauthenticated users. e.g. the sign-in screen"
+  "Enforces session fencing. i.e. it prevents an unauthenticated user to access
+   private screens and authenticated users from accessing pages that are exclusive
+   for unauthenticated users. e.g. the sign-in screen"
   (re-frame/->interceptor
    :id ::session-fencing
    :before (fn [{{[_ {{route-name :name} :data}] :event :as event {user :user :as db} :db} :coeffects :as ctx}]
@@ -26,16 +26,23 @@
               (assoc-in ctx [:effects :db :routes/current] nil)
               ctx))))
 
+(def requested-route
+  "Stores the route that a user requested before the session loaded."
+  (re-frame/->interceptor
+   :id ::requested-route
+   :before (fn [{{[_ {{route-name :name} :data}] :event db :db} :coeffects :as ctx}]
+             (if (:session/loading? db)
+               (assoc-in ctx [:coeffects :db :routes/requested-route-name] route-name)
+               ctx))))
+
 (re-frame/reg-event-db
  ::navigated
- [session-fencing]
+ [requested-route session-fencing]
  (fn-traced [db [_ new-match]]
    (let [old-match (:routes/current db)
          controllers (rfc/apply-controllers (:controllers old-match) new-match)
          target-route (assoc new-match :controllers controllers)]
-     (-> db
-         (assoc :routes/requested target-route)
-         (assoc :routes/current target-route)))))
+     (assoc db :routes/current target-route))))
 
 (re-frame/reg-sub
  ::current-route

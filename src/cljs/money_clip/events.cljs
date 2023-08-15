@@ -72,7 +72,7 @@
 (re-frame/reg-event-fx
  ::session-init
  (fn-traced [{:keys [db]} [_ {:keys [user]}]]
-   {:dispatch-n [[::set-user _ user] [::post-session-redirect]]}))
+   {:dispatch-n [[::set-user _ user] [::session-inited-redirect]]}))
 
 (re-frame/reg-event-fx
  ::no-session
@@ -81,6 +81,6 @@
     :dispatch [::navigate :sign-in]}))
 
 (re-frame/reg-event-fx
- ::post-session-redirect
+ ::session-inited-redirect
  (fn-traced [{:keys [db]} _]
-   {:dispatch [::navigate (get-in db [:routes/requested :data :name])]}))
+   {:dispatch [::navigate (:routes/requested-route-name db)]}))
