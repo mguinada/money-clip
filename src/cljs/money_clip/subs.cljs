@@ -31,3 +31,8 @@
  :<- [::session-state]
  (fn [session]
    (= :authenticated session)))
+
+(re-frame/reg-sub
+ ::server-errors
+ (fn [db]
+   (:errors/server db)))

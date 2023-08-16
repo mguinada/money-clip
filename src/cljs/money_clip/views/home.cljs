@@ -31,7 +31,10 @@
                        (re-frame/dispatch [::events/login (:email @fields) (:password @fields)]))}
          [:div.heading.has-text-centered
           [:h3.title "Login"]
-          [:p.subtitle.is-size-7 "Please enter your email and password"]]
+          [:p.subtitle.is-size-7 "Please enter your email and password"]
+          (when-let [errors @(re-frame/subscribe [::subs/server-errors])]
+            [:div.errors.notification.is-danger
+             [:ul (map (fn [error] ^{:key error} [:li.error error]) errors)]])]
          [:div.field
           [:div.control
            [:input.input

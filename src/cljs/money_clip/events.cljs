@@ -16,6 +16,11 @@
  (fn-traced [_ _]
    {:dispatch [::load-session]}))
 
+(re-frame/reg-event-db
+ ::server-errors
+ (fn-traced [db [_ errors]]
+   (assoc db :errors/server errors)))
+
 (re-frame/reg-event-fx
  ::navigate
  (fn [_ [_ route]]
@@ -32,10 +37,10 @@
  (fn-traced [db [_ {:keys [user]}]]
    {:dispatch-n [[::set-user _ user] [::navigate :home]]}))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  ::login-failure
- (fn-traced [db [_ {:keys [response]}]]
-   (assoc db :login-error response)))
+ (fn-traced [_ [_ {:keys [response]}]]
+   (re-frame/dispatch [::server-errors (vector (get-in response [:error :message]))])))
 
 (re-frame/reg-event-fx
  ::login
