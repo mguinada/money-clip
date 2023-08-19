@@ -12,23 +12,24 @@
 
 | Component         | Description |
 | ----------------- | ----------- |
-| [Request handling](/src/money_clip/handler/README.md) | Maps HTTP [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) URLs (routes) to actions |
-| [RESTful resource models](/src/money_clip/handler/restful/README.md) |Maps domain entities to their [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) representation|
-| [Middleware](/src/money_clip/duct/README.md) | Pluggable infrastructure-bound actions |
-| [Domain model](/src/money_clip/model/README.md) | The business domain entities which encapsulates the business rules |
-| [Persistence](/src/money_clip/persistence/README.md) | Persists the domain entities to the database |
-
+| [Presentation](src/cljs/money_clip/README.md) | The UI |
+| [Request handling](src/clj/money_clip/handler/README.md) | Maps HTTP [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) URLs (routes) to actions |
+| [RESTful resource models](src/clj/money_clip/handler/restful/README.md) |Maps domain entities to their [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) representation|
+| [Middleware](src/clj/money_clip/duct/README.md) | Pluggable infrastructure-bound actions |
+| [Domain model](src/clj/money_clip/model/README.md) | The business domain entities which encapsulates the business rules |
+| [Persistence](src/clj/money_clip/persistence/README.md) | Persists the domain entities to the database |
 
 ## Technological stack
 
 Core technologies employed in the making of this project
 
-| Technology     | Homepage |
-| ---------------| -------- |
-| Database       | [PostgreSQL 1.5.0](https://www.postgresql.org/)   |
-| Framework      | [Duct](https://github.com/duct-framework/duct) |
-| Authentication | [Buddy](https://github.com/funcool/buddy-core) |
-| Runtime        | [Clojure](https://clojure.org/) |
+| Technology        | Homepage |
+| ------------------| -------- |
+| Runtime           | [Clojure](https://clojure.org/) |
+| Database          | [PostgreSQL 1.5.0](https://www.postgresql.org/) |
+| Backend Framework | [Duct](https://github.com/duct-framework/duct) |
+| Authentication    | [Buddy](https://github.com/funcool/buddy-core) |
+| Frontend          | [Re-frame](https://day8.github.io/re-frame/) |
 
 ## Development
 
@@ -65,7 +66,7 @@ Add an environment variable with a session secret key
 export JWT_SECRET=<secret>
 ```
 
-### Booting environment
+### Booting the backend
 
 Start with a REPL.
 
@@ -110,6 +111,12 @@ But you can also run tests through Leiningen.
 
 ```sh
 lein test
+```
+
+### Booting the front end
+
+```sh
+npx shadow-cljs watch app
 ```
 
 ## Legal

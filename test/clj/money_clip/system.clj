@@ -69,10 +69,10 @@
   ([app email first-name last-name]
    (let [password "pa66word"
          create-user-response (POST app "/api/users" {:email email
-                                                  :password password
-                                                  :password-confirmation password
-                                                  :first-name first-name
-                                                  :last-name last-name})
+                                                      :password password
+                                                      :password-confirmation password
+                                                      :first-name first-name
+                                                      :last-name last-name})
          login-user-response (POST app "/api/login" {:email email :password "pa66word"})]
      (assert (= 201 (http/status create-user-response)) "Failed to create user")
      (assert (= 200 (http/status login-user-response)) "Failed to login")

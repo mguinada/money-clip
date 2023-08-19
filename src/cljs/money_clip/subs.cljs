@@ -7,6 +7,32 @@
    (:name db)))
 
 (re-frame/reg-sub
- ::active-panel
+ ::user
+ (fn [db]
+   (:user db)))
+
+(re-frame/reg-sub
+ ::session-loading?
  (fn [db _]
-   (:active-panel db)))
+   (:session/loading? db)))
+
+(re-frame/reg-sub
+ ::session-state
+ :<- [::user]
+ :<- [::session-loading?]
+ (fn [[user loading?]]
+   (cond
+     (true? loading?) :loading
+     user :authenticated
+     :else :anonymous)))
+
+(re-frame/reg-sub
+ ::user-authenticated?
+ :<- [::session-state]
+ (fn [session]
+   (= :authenticated session)))
+
+(re-frame/reg-sub
+ ::server-errors
+ (fn [db]
+   (:errors/server db)))

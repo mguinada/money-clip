@@ -1,6 +1,7 @@
 (ns money-clip.handler.users-test
   (:require [clojure.test :refer [deftest testing is]]
             [clojure.spec.test.alpha :as st]
+            [ring.util.http-predicates :as predicates]
             [integrant.core :as ig]
             [money-clip.mock :as mock]
             [shrubbery.core :as sh]
@@ -34,15 +35,17 @@
           handler (ig/init-key :money-clip.handler.users/login {:db db})
           response (handler (-> (mock/request :post "/login" data)))]
       (is (sh/received? db users/authenticate-user (vals data)) "Authenticates the user")
-      (is (= :ataraxy.response/ok (first response)) "HTTP response")
-      (is (ut/not-blank? (get-in (second response) [:user :auth_token])) "Returns the user with an auth token")))
-  (testing "when the provided credetials are invalid"
+      (is (predicates/ok? response) "HTTP response")
+      (is (ut/not-blank? (get-in (:body response) [:user :auth_token])) "Returns the user with an auth token")
+      (is (ut/not-blank? (get-in response [:session :token])) "Serves a session cookie")))
+  (testing "when the provided credentials are invalid"
     (let [data {:email "john.doe@doe.net" :password "wrong-password"}
           db (sh/mock users/Users {:authenticate-user nil})
           handler (ig/init-key :money-clip.handler.users/login {:db db})
           response (handler (-> (mock/request :post "/login" data)))]
       (is (sh/received? db users/authenticate-user (vals data)) "Authenticates the user")
-      (is (= :ataraxy.response/unauthorized (first response)) "HTTP response"))))
+      (is (= :ataraxy.response/unauthorized (first response)) "HTTP response")
+      (is (ut/blank? (:session response))) "Does not serve a session cookie")))
 
 (deftest user-test
   (testing "when the user with the provided id exists"

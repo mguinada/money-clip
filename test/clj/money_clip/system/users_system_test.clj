@@ -45,11 +45,13 @@
     (testing "when the login is valid"
       (let [response (POST @system/app "/api/login" {:email "john.doe@doe.net" :password "pa66word"})]
         (is (= 200 (http/status response)) "Serves a 200 HTTP status code")
-        (is (ut/not-blank? (http/body response :user :auth_token)) "Returns an authorization token")))
+        (is (ut/not-blank? (http/body response :user :auth_token)) "Returns an authorization token")
+        (is (ut/not-blank? (:cookie-jar response)) "Serves a session cookie")))
     (testing "when the login is invalid"
       (let [response (POST @system/app "/api/login" {:email "john.doe@doe.net" :password "wrong-password"})]
         (is (= 401 (http/status response)) "Serves a 401 HTTP status code")
-        (is (= "Unauthorized" (http/body response :error :message)) "Serves an error message")))))
+        (is (= "Invalid credentials" (http/body response :error :message)) "Serves an error message")
+        (is (ut/blank? (:cookie-jar response)) "Does not serve a session cookie")))))
 
 (deftest get-user-test
   (let [[user auth-token] (system/create-user-and-login @system/app)]
