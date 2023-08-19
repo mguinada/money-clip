@@ -20,7 +20,10 @@
                 ^:auth/authorize ^:auth/id [:money-clip.handler.users/change-password current-password password password-confirmation]}
 
      ["/session"] {[:get {session :session}]
-                   [:money-clip.handler.users/session session]}
+                   [:money-clip.handler.users/get-session session]
+
+                   [:delete {session :session}]
+                   [:money-clip.handler.users/delete-session session]}
 
      ["/bank-accounts"] {[:get]
                          ^:auth/authorize ^:auth/id [:money-clip.handler.bank-accounts/user-bank-accounts]
@@ -55,7 +58,9 @@
 
   :money-clip.handler.users/user {}
 
-  :money-clip.handler.users/session {}
+  :money-clip.handler.users/get-session {}
+
+  :money-clip.handler.users/delete-session {}
 
   :money-clip.handler.users/login
   {:db #ig/ref :duct.database/sql :jwt-secret #duct/env "JWT_SECRET"}

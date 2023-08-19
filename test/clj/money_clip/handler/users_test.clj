@@ -37,7 +37,7 @@
       (is (sh/received? db users/authenticate-user (vals data)) "Authenticates the user")
       (is (predicates/ok? response) "HTTP response")
       (is (ut/not-blank? (get-in (:body response) [:user :auth_token])) "Returns the user with an auth token")
-      (is (ut/not-blank? (get-in response [:session :token]))) "Serves a session cookie"))
+      (is (ut/not-blank? (get-in response [:session :token])) "Serves a session cookie")))
   (testing "when the provided credentials are invalid"
     (let [data {:email "john.doe@doe.net" :password "wrong-password"}
           db (sh/mock users/Users {:authenticate-user nil})

@@ -42,6 +42,13 @@
   (fn [{user :user [_ current-password password password-confirmation] :ataraxy/result}]
     [::response/ok (r/user-resource (users/update-user-password db user current-password password password-confirmation))]))
 
-(defmethod ig/init-key ::session [_ _]
+(defmethod ig/init-key ::get-session [_ _]
   (fn [{[_ {token :token}] :ataraxy/result}]
-    [::response/ok {:token token}]))
+    (if (some? token)
+      [::response/ok {:token token}]
+      [::response/not-found])))
+
+(defmethod ig/init-key ::delete-session [_ _]
+  (fn [{[_ _] :ataraxy/result}]
+    (-> (ring.util.http-response/ok)
+        (assoc :session nil))))
