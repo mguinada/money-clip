@@ -24,7 +24,6 @@
 (re-frame/reg-event-fx
  ::navigate
  (fn [_ [_ route]]
-   ;; See `navigate!` effect in routes.cljs
    {:money-clip.routes/navigate! route}))
 
 (re-frame/reg-event-db
@@ -32,10 +31,15 @@
  (fn-traced [db [_ user]]
    (assoc db :user user :session/loading? false)))
 
+(re-frame/reg-event-db
+ ::unset-user
+ (fn-traced [db _]
+   (dissoc db :user)))
+
 (re-frame/reg-event-fx
  ::login-success
- (fn-traced [db [_ {:keys [user]}]]
-   {:dispatch-n [[::set-user _ user] [::navigate :home]]}))
+ (fn-traced [_ [_ {:keys [user]}]]
+   {:dispatch-n [[::set-user user] [::navigate :home]]}))
 
 (re-frame/reg-event-fx
  ::login-failure
@@ -52,6 +56,26 @@
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success [::login-success]
                  :on-failure [::login-failure]}}))
+
+(re-frame/reg-event-fx
+ ::logout
+ (fn-traced [_ [_ email password]]
+   {:http-xhrio {:method :delete
+                 :uri "/api/session"
+                 :format (ajax/json-request-format)
+                 :response-format (ajax/raw-response-format)
+                 :on-success [::logout-success]
+                 :on-failure [::logout-failure]}}))
+
+(re-frame/reg-event-fx
+ ::logout-success
+ (fn-traced [_ _]
+   {:dispatch-n [[::unset-user] [::navigate :sign-in]]}))
+
+(re-frame/reg-event-fx
+ ::logout-failure
+ (fn-traced [_ _]
+   {}))
 
 (re-frame/reg-event-fx
  ::load-session

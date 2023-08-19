@@ -1,7 +1,8 @@
 (ns money-clip.views.navigation
   (:require [re-frame.core :as re-frame]
-            [clojure.string :as string]
-            [money-clip.subs :as subs]))
+            [money-clip.subs :as subs]
+            [money-clip.events :as events]
+            [clojure.string :as string]))
 
 (defn- user-menu []
   (let [user @(re-frame/subscribe [::subs/user])
@@ -28,7 +29,9 @@
        [:span.icon [:i.mdi.mdi-email]]
        [:span "Messages"]]
       [:hr.navbar-divider]
-      [:a.navbar-item
+      [:a.navbar-item {:on-click (fn [e]
+                                   (.preventDefault e)
+                                   (re-frame/dispatch [::events/logout]))}
        [:span.icon [:i.mdi.mdi-logout]]
        [:span "Log Out"]]]]))
 
