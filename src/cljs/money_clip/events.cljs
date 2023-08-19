@@ -77,7 +77,7 @@
 (re-frame/reg-event-fx
  ::session-init
  (fn-traced [{:keys [db]} [_ {:keys [user]}]]
-   {:dispatch-n [[::set-user _ user] [::session-inited-redirect]]}))
+   {:dispatch-n [[::set-user user] [::session-inited-redirect]]}))
 
 (re-frame/reg-event-fx
  ::no-session

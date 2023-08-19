@@ -1,6 +1,36 @@
 (ns money-clip.views.navigation
   (:require [re-frame.core :as re-frame]
+            [clojure.string :as string]
             [money-clip.subs :as subs]))
+
+(defn- user-menu []
+  (let [user @(re-frame/subscribe [::subs/user])
+        first-name (:first_name user)
+        last-name (:last_name user)
+        names [first-name last-name]
+        full-name (string/join " " names)
+        monogram (string/join "-" (map #(first %) names))]
+    [:div.navbar-item.has-dropdown.has-dropdown-with-icons.has-divider.has-user-avatar.is-hoverable
+     [:a.navbar-link.is-arrowless
+      [:div.is-user-avatar
+       [:img {:src (str "https://avatars.dicebear.com/v2/initials/" monogram ".svg") :alt full-name}]]
+      [:div.is-user-name [:span full-name]]
+      [:span.icon [:i.mdi.mdi-chevron-down]]]
+     [:div.navbar-dropdown
+      [:a
+       {:href "profile.html" :class "navbar-item"}
+       [:span.icon [:i.mdi.mdi-account]]
+       [:span "My Profile"]]
+      [:a.navbar-item
+       [:span.icon [:i.mdi.mdi-settings]]
+       [:span "Settings"]]
+      [:a.navbar-item
+       [:span.icon [:i.mdi.mdi-email]]
+       [:span "Messages"]]
+      [:hr.navbar-divider]
+      [:a.navbar-item
+       [:span.icon [:i.mdi.mdi-logout]]
+       [:span "Log Out"]]]]))
 
 (defn- navbar []
   [:nav#navbar-main.navbar.is-fixed-top
@@ -16,27 +46,7 @@
      [:span.icon [:i.mdi.mdi-dots-vertical]]]]
    [:div#navbar-menu.navbar-menu.fadeIn.animated.faster
     [:div.navbar-end
-     [:div.navbar-item.has-dropdown.has-dropdown-with-icons.has-divider.has-user-avatar.is-hoverable
-      [:a.navbar-link.is-arrowless
-       [:div.is-user-avatar
-        [:img {:src "https://avatars.dicebear.com/v2/initials/john-doe.svg" :alt "John Doe"}]]
-       [:div.is-user-name [:span "John Doe"]]
-       [:span.icon [:i.mdi.mdi-chevron-down]]]
-      [:div.navbar-dropdown
-       [:a
-        {:href "profile.html" :class "navbar-item"}
-        [:span.icon [:i.mdi.mdi-account]]
-        [:span "My Profile"]]
-       [:a.navbar-item
-        [:span.icon [:i.mdi.mdi-settings]]
-        [:span "Settings"]]
-       [:a.navbar-item
-        [:span.icon [:i.mdi.mdi-email]]
-        [:span "Messages"]]
-       [:hr.navbar-divider]
-       [:a.navbar-item
-        [:span.icon [:i.mdi.mdi-logout]]
-        [:span "Log Out"]]]]
+     [user-menu]
      [:a.navbar-item.has-divider.is-desktop-icon-only {:href "https://justboil.me/bulma-admin-template/free-html-dashboard/" :title "About"}
       [:span.icon [:i.mdi.mdi-help-circle-outline]]
       [:span "About"]]
