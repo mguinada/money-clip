@@ -30,7 +30,7 @@
             [lein-codox "0.10.8"]
             [venantius/ultra "0.6.0"]]
   :source-paths ["src/clj" "src/cljs" "src/cljc"]
-  :test-paths ["test/clj"]
+  :test-paths ["test/clj" "test/cljs"]
   :main ^:skip-aot money-clip.main
   :codox {:output-path "docs"}
   :uberjar-name "money-clip-standalone.jar"
@@ -66,4 +66,6 @@
                                    [kerodon "0.9.1"]
                                    [com.gearswithingears/shrubbery "0.4.1"]
                                    [metosin/muuntaja "0.6.8"]
-                                   [peridot "0.5.4"]]}})
+                                   [peridot "0.5.4"]
+                                   [mocha-latte "0.1.2"]
+                                   [chai-latte "0.2.0"]]}})
