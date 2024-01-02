@@ -1,13 +1,20 @@
+const {createDefaultConfig} = require('@open-wc/testing-karma');
+const merge = require('deepmerge');
 module.exports = function (config) {
   var junitOutputDir = process.env.CIRCLE_TEST_REPORTS || "target/junit"
 
-  config.set({
+  config.set(merge(createDefaultConfig(config), {
     browsers: ['ChromeHeadless'],
     basePath: 'target',
     files: ['karma-test.js'],
-    frameworks: ['cljs-test'],
+    frameworks: ['cljs-test', 'mocha', 'chai'],
+    client: {
+        mocha: {ui: 'bdd'}
+    },
     plugins: [
         'karma-cljs-test',
+        'karma-mocha',
+        'karma-chai',
         'karma-chrome-launcher',
         'karma-junit-reporter'
     ],
@@ -23,5 +30,5 @@ module.exports = function (config) {
       outputFile: undefined, // if included, results will be saved as outputDir/browserName/outputFile
       suite: '' // suite will become the package name attribute in xml testsuite element
     }
-  })
+  }))
 }
